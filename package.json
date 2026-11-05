@@ -46,7 +46,7 @@
     "playground": "ladle serve --config playground",
     "playground:build": "ladle build --config playground --outDir playground/dist",
     "playground:smoke": "npm run playground:build && playwright test",
-    "check:exports": "publint && attw --pack --profile esm-only",
+    "check:exports": "publint && attw --pack --profile esm-only --exclude-entrypoints ./theme.css ./styles.css ./fonts.css",
     "docs": "typedoc",
     "prepare": "lefthook install"
   },
