@@ -6,7 +6,9 @@ import { DataTableViewOptions } from './DataTableViewOptions';
 import type { DataTableColumnDef } from './dataTableLabels';
 import { makePeople, type Person, personColumns } from './dataTableTestUtils';
 
-const headerTexts = () => screen.getAllByRole('columnheader').map((th) => th.textContent);
+// The open menu marks the rest of the page aria-hidden (Radix), so include hidden elements.
+const headerTexts = () =>
+  screen.getAllByRole('columnheader', { hidden: true }).map((th) => th.textContent);
 
 async function openView() {
   const user = userEvent.setup();
