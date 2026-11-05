@@ -46,4 +46,4 @@ This repo is `@integr8-media/ui`: the design system for every @integr8-media app
 ## CI and hooks
 
 - CI runs on pull requests into dev only (shared `pr-checks.yml` from integr8-config): lint, typecheck, tests with an 80% line-coverage floor, bundle size, export checks (publint, attw). No OS matrix for this package.
-- Lefthook (extends `@integr8-media/config/lefthook/base.yml`): pre-commit = Biome on staged files; pre-push = typecheck, test:coverage, build, playground:smoke.
+- Lefthook (extends `@integr8-media/config/lefthook/base.yml`): pre-commit = Biome on staged files; pre-push = typecheck, test:coverage, build. The base file's playground:smoke step is skipped in `lefthook.yml`; run it by hand.

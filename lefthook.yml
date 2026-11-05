@@ -1,2 +1,8 @@
 extends:
   - node_modules/@integr8-media/config/lefthook/base.yml
+
+pre-push:
+  commands:
+    # Turned off for this repo: run `npm run playground:smoke` by hand when needed.
+    playground-smoke:
+      skip: true
