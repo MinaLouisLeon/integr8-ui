@@ -121,7 +121,7 @@ Every theme defines the same CSS variables (shadcn names plus extras):
 | Feedback | ✅ Toaster + `toast()` (sonner), ✅ EmptyState | ✅ Done (2/2) |
 | Command + menus | ✅ Command, ✅ CommandDialog (palette), ✅ ContextMenu, ✅ Menubar, ✅ Shortcut (keyboard shortcut display with OS-aware ⌘/Ctrl) | ✅ Done (5/5) |
 | Form kit | ✅ Form, ✅ FormField, ✅ FormItem, ✅ FormLabel, ✅ FormControl, ✅ FormDescription, ✅ FormMessage; ready fields: ✅ TextField, ✅ PasswordField, ✅ NumberField, ✅ TextareaField, ✅ SelectField, ✅ CheckboxField, ✅ SwitchField, ✅ RadioField; ✅ `useZodForm(schema, options)` | ✅ Done (16/16) |
-| Data table | DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), DataTableToolbar, DataTablePagination, DataTableColumnHeader, DataTableViewOptions | To do (0/5) |
+| Data table | ✅ DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), ✅ DataTableToolbar, ✅ DataTablePagination, ✅ DataTableColumnHeader, ✅ DataTableViewOptions | ✅ Done (5/5) |
 | App layout | Sidebar (collapsible, icon-only mode), PageHeader, SplitPanes (react-resizable-panels), StatusBar, Toolbar | To do (0/5) |
 | Theme | ✅ ThemeProvider, ThemeSwitcher, GradientText, GrainOverlay | In progress (1/4) |
 
@@ -229,6 +229,82 @@ RadioField     // + options, orientation ('vertical' | 'horizontal', default ver
 - NumberField turns empty text into `undefined` and non-numbers into `NaN`, so zod reports them (`z.number('Enter a number')`).
 - Error messages come from the schema; the kit adds no text of its own except the PasswordField toggle label.
 
+### Data table API
+
+Built in `src/components/data-table/` on @tanstack/react-table v8 (`^8.21.3`).
+
+```ts
+type DataTableColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue>; // TanStack v8
+type DataTableInstance<TData> = Table<TData>;                              // TanStack v8
+
+export function DataTable<TData, TValue>(props: Omit<ComponentProps<'div'>, 'children'> & {
+  columns: DataTableColumnDef<TData, TValue>[];
+  data: TData[];
+  getRowId?: (row: TData, index: number, parent?: Row<TData>) => string; // default: row index
+  enableRowSelection?: boolean | ((row: Row<TData>) => boolean); // default false; adds a checkbox column (id 'select')
+  enableSorting?: boolean;              // default true
+  enableMultiSort?: boolean;            // default true (Shift+click)
+  toolbar?: false | ((table: DataTableInstance<TData>) => ReactNode); // default <DataTableToolbar />
+  paginate?: boolean;                   // default true; false shows every row and no pagination bar
+  pageSize?: number;                    // default 10
+  pageSizeOptions?: readonly number[];  // default [10, 20, 30, 50, 100]
+  // Controlled state (each optional; the table keeps whatever is not controlled):
+  sorting?; onSortingChange?; columnFilters?; onColumnFiltersChange?;
+  globalFilter?: string; onGlobalFilterChange?; pagination?; onPaginationChange?;
+  columnVisibility?; onColumnVisibilityChange?; rowSelection?; onRowSelectionChange?;
+  initialState?: InitialTableState;
+  // Server-side:
+  manualSorting?: boolean; manualFiltering?: boolean; manualPagination?: boolean; rowCount?: number;
+  emptyState?: ReactNode;               // replaces labels.noResults in the empty body
+  labels?: Partial<DataTableLabels>;
+  useVirtualRows?: DataTableVirtualRowsHook<TData>;
+  tableContainerClassName?: string;     // the scrolling box; give it a height when virtualizing
+}): JSX.Element;
+
+export function DataTableColumnHeader<TData, TValue>(props: ComponentProps<'div'> & {
+  column: Column<TData, TValue>;
+  title: string;
+}): JSX.Element; // menu: Asc / Desc / Hide; plain text when the column can neither sort nor hide
+
+export function DataTableToolbar<TData>(props: ComponentProps<'div'> & {
+  table: DataTableInstance<TData>;
+  showSearch?: boolean;                 // default true; sets the global filter
+  showViewOptions?: boolean;            // default true
+  children?: ReactNode;                 // your own filters, after the search input
+}): JSX.Element; // shows "Reset" while the search or any column filter is active
+
+export function DataTablePagination<TData>(props: ComponentProps<'div'> & {
+  table: DataTableInstance<TData>;
+  pageSizeOptions?: readonly number[];
+}): JSX.Element; // selected count (when selection is on), rows per page, "Page x of y", first/prev/next/last
+
+export function DataTableViewOptions<TData>(props: {
+  table: DataTableInstance<TData>;
+  className?: string;
+}): JSX.Element; // lists hideable accessor columns by string header, else column id
+
+interface DataTableLabels {             // every text the table shows; English defaults
+  noResults; searchPlaceholder; searchLabel; reset; view; toggleColumns;
+  sortAscending; sortDescending; hideColumn; rowsPerPage;
+  page(page, pageCount): string; selectedRows(selected, total): string;
+  firstPage; previousPage; nextPage; lastPage; selectAll; selectRow;
+}
+
+// Virtualization hook-in (shape matches @tanstack/react-virtual's VirtualItem; no dependency)
+interface DataTableVirtualRow { index: number; start: number; end: number; key: Key }
+interface DataTableVirtualRows { rows: readonly DataTableVirtualRow[]; totalSize: number }
+type DataTableVirtualRowsHook<TData> = (
+  rows: readonly Row<TData>[],
+  getScrollElement: () => HTMLDivElement | null,
+) => DataTableVirtualRows | null;     // null = render every row
+```
+
+- The search is TanStack's global filter (`includesString`, case-insensitive) over string and number columns. Column filters are set from your own toolbar controls with `table.getColumn(id)?.setFilterValue(value)`.
+- `<th>` gets `aria-sort` (`ascending`, `descending` or `none`) on sortable columns; selected rows get `data-state="selected"`.
+- Labels reach the toolbar, pagination, header and checkbox parts through context, so one `labels` prop translates the whole table.
+- With `useVirtualRows`, the body renders only the returned rows between two spacer rows and the header becomes sticky. The hook is called on every render; pass the same hook for the table's whole life.
+- The table markup (`table`, `thead`, `tr`, `th`, `td`) is internal; there are no exported `Table*` primitives.
+
 ## Folder layout
 
 ```
@@ -295,3 +371,7 @@ export function App() {
 - `formatShortcut` and `detectShortcutPlatform` are exported beyond the original component list (for tooltips and aria labels). Keep public or make internal?
 - Form kit exports beyond the original list: `useFormField`, `FormError`, and the `FieldBaseProps` and `FieldOption` types (for building custom fields). The field props (`options`, `placeholder`, `showToggle`, `toggleLabel`, `orientation`, `*ClassName`) were not named in the original spec. Keep or change?
 - Form kit stories are one file, `playground/form/Form.stories.tsx` (a full sign-up form, disabled fields, a custom field), not one file per field. Split them?
+- Data table uses @tanstack/react-table **v8** (`^8.21.3`), not the current v9. v9 types every column and table by a feature set (`ColumnDef<TFeatures, TData>`), which is hard to export cleanly under `isolatedDeclarations`. Move to v9 later (it changes `DataTableColumnDef` and `DataTableInstance`)?
+- Data table exports beyond the original list: the types `DataTableColumnDef`, `DataTableInstance`, `DataTableLabels`, `DataTableVirtualRow`, `DataTableVirtualRows`, `DataTableVirtualRowsHook`, and every `*Props` type. The props listed in the Data table API were not named in the original spec. Keep or change?
+- No faceted filter (shadcn's per-column multi-select with counts) and no exported `Table*` primitives in v1. Add them?
+- Data table stories are one file, `playground/data-table/DataTable.stories.tsx` (default, row selection, custom toolbar, server-side, empty, translated labels, 10,000 virtualized rows), not one file per part. Split them?

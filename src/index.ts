@@ -361,6 +361,35 @@ export {
   formatShortcut,
   type ShortcutPlatform,
 } from './components/command/shortcutKeys';
+// ---------- Data table ----------
+export {
+  DataTable,
+  type DataTableProps,
+  type DataTableVirtualRow,
+  type DataTableVirtualRows,
+  type DataTableVirtualRowsHook,
+} from './components/data-table/DataTable';
+export {
+  DataTableColumnHeader,
+  type DataTableColumnHeaderProps,
+} from './components/data-table/DataTableColumnHeader';
+export {
+  DataTablePagination,
+  type DataTablePaginationProps,
+} from './components/data-table/DataTablePagination';
+export {
+  DataTableToolbar,
+  type DataTableToolbarProps,
+} from './components/data-table/DataTableToolbar';
+export {
+  DataTableViewOptions,
+  type DataTableViewOptionsProps,
+} from './components/data-table/DataTableViewOptions';
+export type {
+  DataTableColumnDef,
+  DataTableInstance,
+  DataTableLabels,
+} from './components/data-table/dataTableLabels';
 // ---------- Feedback ----------
 export {
   EmptyState,
