@@ -1,0 +1,10 @@
+/*
+ * Fonts used by the themes, bundled from Fontsource (no Google Fonts requests, works offline).
+ * scripts/buildAssets.mjs inlines these imports into dist/fonts.css and copies the font
+ * files to dist/fonts/. Vite (the playground) reads this file as it is.
+ */
+@import "@fontsource-variable/inter/index.css";
+@import "@fontsource-variable/jetbrains-mono/index.css";
+@import "@fontsource/unbounded/400.css";
+@import "@fontsource/unbounded/600.css";
+@import "@fontsource/unbounded/800.css";

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+docs/api/
+playground/dist/
+test-results/
+playwright-report/
+*.tgz
+*.log

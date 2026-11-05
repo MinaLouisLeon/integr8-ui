@@ -1,0 +1,86 @@
+import '../src/styles/fonts.css';
+import '../src/styles/theme.css';
+import type { GlobalProvider } from '@ladle/react';
+import type { JSX } from 'react';
+import { ThemeProvider, type ThemeStorage, useTheme } from '../src';
+
+/** Query parameter that picks the theme, used by the smoke test: `?integr8Theme=dark`. */
+const THEME_PARAM = 'integr8Theme';
+const STORAGE_KEY = 'integr8-ui-playground-theme';
+
+// The URL wins over the saved choice, so every story can be opened in a given theme.
+const playgroundStorage: ThemeStorage = {
+  get() {
+    const fromUrl = new URLSearchParams(window.location.search).get(THEME_PARAM);
+    return fromUrl ?? window.localStorage.getItem(STORAGE_KEY);
+  },
+  set(theme) {
+    window.localStorage.setItem(STORAGE_KEY, theme);
+  },
+};
+
+function ThemeToolbar(): JSX.Element {
+  const { theme, resolvedTheme, themes, setTheme } = useTheme();
+  const options = [
+    { name: 'system', label: 'System' },
+    ...themes.map(({ name, label }) => ({ name, label })),
+  ];
+
+  return (
+    <div
+      role="toolbar"
+      aria-label="Theme"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '8px 16px',
+        borderBottom: '1px solid var(--border)',
+        background: 'var(--card)',
+        color: 'var(--card-foreground)',
+        fontFamily: 'var(--font-sans)',
+        fontSize: 13,
+      }}
+    >
+      <strong style={{ marginRight: 8 }}>Theme</strong>
+      {options.map((option) => (
+        <button
+          key={option.name}
+          type="button"
+          aria-pressed={theme === option.name}
+          onClick={() => setTheme(option.name)}
+          style={{
+            padding: '4px 12px',
+            borderRadius: 'var(--radius)',
+            border: '1px solid var(--border)',
+            cursor: 'pointer',
+            font: 'inherit',
+            background: theme === option.name ? 'var(--primary)' : 'transparent',
+            color: theme === option.name ? 'var(--primary-foreground)' : 'inherit',
+          }}
+        >
+          {option.label}
+        </button>
+      ))}
+      <span style={{ marginLeft: 'auto', color: 'var(--muted-foreground)' }}>
+        resolved: {resolvedTheme}
+      </span>
+    </div>
+  );
+}
+
+export const Provider: GlobalProvider = ({ children }) => (
+  <ThemeProvider defaultTheme="system" storage={playgroundStorage}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'var(--background)',
+        color: 'var(--foreground)',
+        fontFamily: 'var(--font-sans)',
+      }}
+    >
+      <ThemeToolbar />
+      <div style={{ padding: 24 }}>{children}</div>
+    </div>
+  </ThemeProvider>
+);
