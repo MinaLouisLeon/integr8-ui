@@ -120,7 +120,7 @@ Every theme defines the same CSS variables (shadcn names plus extras):
 | Basics | ✅ Accordion, ✅ Alert, ✅ AlertDialog, ✅ Avatar, ✅ Badge, ✅ Breadcrumb, ✅ Button, ✅ Card, ✅ Checkbox, ✅ Collapsible, ✅ Dialog, ✅ DropdownMenu, ✅ HoverCard, ✅ Input, ✅ Kbd, ✅ Label, ✅ Popover, ✅ Progress, ✅ RadioGroup, ✅ ScrollArea, ✅ Select, ✅ Separator, ✅ Sheet, ✅ Skeleton, ✅ Slider, ✅ Spinner, ✅ Switch, ✅ Tabs, ✅ Textarea, ✅ Toggle, ✅ ToggleGroup, ✅ Tooltip | ✅ Done (32/32) |
 | Feedback | ✅ Toaster + `toast()` (sonner), ✅ EmptyState | ✅ Done (2/2) |
 | Command + menus | ✅ Command, ✅ CommandDialog (palette), ✅ ContextMenu, ✅ Menubar, ✅ Shortcut (keyboard shortcut display with OS-aware ⌘/Ctrl) | ✅ Done (5/5) |
-| Form kit | Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage; ready fields: TextField, PasswordField, NumberField, TextareaField, SelectField, CheckboxField, SwitchField, RadioField; `useZodForm(schema, options)` | To do |
+| Form kit | ✅ Form, ✅ FormField, ✅ FormItem, ✅ FormLabel, ✅ FormControl, ✅ FormDescription, ✅ FormMessage; ready fields: ✅ TextField, ✅ PasswordField, ✅ NumberField, ✅ TextareaField, ✅ SelectField, ✅ CheckboxField, ✅ SwitchField, ✅ RadioField; ✅ `useZodForm(schema, options)` | ✅ Done (16/16) |
 | Data table | DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), DataTableToolbar, DataTablePagination, DataTableColumnHeader, DataTableViewOptions | To do (0/5) |
 | App layout | Sidebar (collapsible, icon-only mode), PageHeader, SplitPanes (react-resizable-panels), StatusBar, Toolbar | To do (0/5) |
 | Theme | ✅ ThemeProvider, ThemeSwitcher, GradientText, GrainOverlay | In progress (1/4) |
@@ -178,6 +178,56 @@ export function detectShortcutPlatform(): 'mac' | 'other';
 - `mod` is ⌘ on macOS/iOS/iPadOS and Ctrl elsewhere. Other key names: `ctrl`, `alt`/`option`, `shift`, `meta`/`cmd`/`win`, `enter`, `esc`, `tab`, `space`, `backspace`, `delete`, `up`/`down`/`left`/`right`, `pageup`, `pagedown`, `home`, `end`, `plus`. Single letters and `f1`–`f24` are upper-cased; anything else is shown as written; keys keep the given order.
 - Apple style joins keys without a separator (`⌘⇧P`); the other style joins with `+` (`Ctrl+Shift+P`). Screen readers get the spoken form (`Command+Shift+P`).
 - Shortcut, `CommandShortcut` and the menu `*Shortcut` parts are display only; they do not bind keys.
+
+### Form kit API
+
+Built in `src/components/form/` on react-hook-form, @hookform/resolvers and zod (v4).
+
+```ts
+// Hook
+export function useZodForm<TSchema extends z.ZodType<FieldValues, FieldValues>>(
+  schema: TSchema,
+  options?: Omit<UseFormProps<z.input<TSchema>, unknown, z.output<TSchema>>, 'resolver'>,
+): UseFormReturn<z.input<TSchema>, unknown, z.output<TSchema>>;
+//  - values are typed from the schema input; handleSubmit receives the parsed output
+
+// Parts (shadcn pattern)
+export const Form: typeof FormProvider;             // <Form {...form}><form>...</form></Form>
+export function FormField(props: ControllerProps<TFieldValues, TName, TTransformedValues>): JSX.Element;
+export function FormItem(props: ComponentProps<'div'>): JSX.Element;
+export function FormLabel(props: LabelProps): JSX.Element;        // destructive while invalid
+export function FormControl(props: SlotProps): JSX.Element;       // id, aria-invalid, aria-describedby
+export function FormDescription(props: ComponentProps<'p'>): JSX.Element;
+export function FormMessage(props: ComponentProps<'p'>): JSX.Element | null; // error (role="alert") or children
+export function useFormField(): { id; name; formItemId; formDescriptionId; formMessageId; invalid; error };
+export class FormError extends Error { code: 'NO_FORM_FIELD' } // a part used outside <FormField>
+
+// Ready fields: label + control + description + message in one component
+interface FieldBaseProps<TFieldValues, TName, TTransformedValues> {
+  name: TName;                          // path in the form, typed from the schema
+  control?: Control<...>;               // optional inside <Form>
+  label: ReactNode;
+  description?: ReactNode;
+  disabled?: boolean;
+  className?: string;                   // the FormItem wrapper
+}
+interface FieldOption { value: string; label: ReactNode; disabled?: boolean }
+
+TextField      // + native <input> props, inputClassName; stores a string
+PasswordField  // + native <input> props (no type), inputClassName, showToggle (default true),
+               //   toggleLabel (default 'Show password'); autoComplete default 'current-password'
+NumberField    // + native <input> props (no type), inputClassName; stores number | undefined (empty)
+TextareaField  // + native <textarea> props, textareaClassName; stores a string
+SelectField    // + options, placeholder, triggerClassName; stores the option value
+CheckboxField  // stores boolean; use z.literal(true) for "must accept"
+SwitchField    // settings row, switch on the right; stores boolean
+RadioField     // + options, orientation ('vertical' | 'horizontal', default vertical); stores the option value
+```
+
+- Fields wire `aria-invalid`, `aria-describedby` (description + message) and the label automatically; RadioField names its radiogroup with `aria-labelledby`.
+- Unset values render as empty (`''` for text, placeholder for select, unchecked for booleans), so inputs never switch between uncontrolled and controlled.
+- NumberField turns empty text into `undefined` and non-numbers into `NaN`, so zod reports them (`z.number('Enter a number')`).
+- Error messages come from the schema; the kit adds no text of its own except the PasswordField toggle label.
 
 ## Folder layout
 
@@ -243,3 +293,5 @@ export function App() {
 - The three added colors (destructive `#ff5470`, success `#3ddc97`, warning `#ffb547`) are new; keep or change?
 - Size budgets are first guesses; adjust after the first build.
 - `formatShortcut` and `detectShortcutPlatform` are exported beyond the original component list (for tooltips and aria labels). Keep public or make internal?
+- Form kit exports beyond the original list: `useFormField`, `FormError`, and the `FieldBaseProps` and `FieldOption` types (for building custom fields). The field props (`options`, `placeholder`, `showToggle`, `toggleLabel`, `orientation`, `*ClassName`) were not named in the original spec. Keep or change?
+- Form kit stories are one file, `playground/form/Form.stories.tsx` (a full sign-up form, disabled fields, a custom field), not one file per field. Split them?

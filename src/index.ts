@@ -368,6 +368,38 @@ export {
   type EmptyStateVariant,
 } from './components/feedback/EmptyState';
 export { Toaster, type ToasterProps, toast } from './components/feedback/Toaster';
+// ---------- Form kit ----------
+export {
+  CheckboxField,
+  type CheckboxFieldProps,
+} from './components/form/CheckboxField';
+export {
+  Form,
+  FormControl,
+  type FormControlProps,
+  FormDescription,
+  type FormDescriptionProps,
+  FormError,
+  type FormErrorCode,
+  FormField,
+  type FormFieldProps,
+  FormItem,
+  type FormItemProps,
+  FormLabel,
+  type FormLabelProps,
+  FormMessage,
+  type FormMessageProps,
+  useFormField,
+} from './components/form/Form';
+export type { FieldBaseProps, FieldOption } from './components/form/fieldBase';
+export { NumberField, type NumberFieldProps } from './components/form/NumberField';
+export { PasswordField, type PasswordFieldProps } from './components/form/PasswordField';
+export { RadioField, type RadioFieldProps } from './components/form/RadioField';
+export { SelectField, type SelectFieldProps } from './components/form/SelectField';
+export { SwitchField, type SwitchFieldProps } from './components/form/SwitchField';
+export { TextareaField, type TextareaFieldProps } from './components/form/TextareaField';
+export { TextField, type TextFieldProps } from './components/form/TextField';
+export { type UseZodFormOptions, useZodForm } from './components/form/useZodForm';
 
 // ---------- Theme and utilities ----------
 export { cn } from './lib/cn';
