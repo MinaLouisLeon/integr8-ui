@@ -1,0 +1,10 @@
+/*
+ * Entry for dist/styles.css: the prebuilt CSS for apps without Tailwind.
+ * Tailwind compiles this into tokens + every class the components use.
+ */
+@import "tailwindcss";
+@import "./theme.css";
+
+/* Scan the package source for the classes the components use. */
+@source "../";
+@source not "../**/*.test.{ts,tsx}";
