@@ -8,6 +8,9 @@
  * Token values must match src/theme/themes/*.ts (a unit test checks this).
  */
 
+/* Enter/exit animations used by the components (animate-in, fade-in-0, zoom-in-95, ...). */
+@import "tw-animate-css";
+
 /* Let Tailwind see the classes used by the package's built files (dist/). */
 @source "./**/*.mjs";
 
@@ -188,5 +191,23 @@
   [data-theme="integr8"] ::selection {
     background-color: var(--primary);
     color: var(--primary-foreground);
+  }
+}
+
+/*
+ * Reduced motion: component animations finish at once. The duration is tiny rather than
+ * `none`, so `animationend` still fires and Radix unmounts closed overlays. The spinner keeps
+ * turning, because it is the only sign that something is loading.
+ *
+ * Left outside any layer on purpose: unlayered rules win over Tailwind's utilities layer
+ * (`duration-200`, `animate-in`, ...) without `!important`.
+ */
+@media (prefers-reduced-motion: reduce) {
+  [data-slot]:not([data-slot="spinner"]),
+  [data-slot]:not([data-slot="spinner"])::before,
+  [data-slot]:not([data-slot="spinner"])::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
   }
 }

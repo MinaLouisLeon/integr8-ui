@@ -7,7 +7,8 @@ a command palette and app layout pieces.
 The full spec is in [docs/SPEC.md](docs/SPEC.md).
 
 > **Status: in progress.** Done so far: the theme engine (`ThemeProvider`, `useTheme`,
-> `defineTheme`, `getThemeScript`), `cn`, `theme.css` and `fonts.css`. Components come next.
+> `defineTheme`, `getThemeScript`), `cn`, `theme.css`, `fonts.css` and the basic components.
+> Next: feedback, command and menus, form kit, data table, app layout, registry.
 
 ## Requirements
 
@@ -144,6 +145,46 @@ font-display, font-mono`.
 The theme engine throws `ThemeError` with a `code`: `UNKNOWN_THEME` (unregistered name passed
 to `setTheme` or `defaultTheme`), `INVALID_THEME` (bad `defineTheme` input or a duplicate theme
 name) or `MISSING_PROVIDER` (`useTheme` outside `ThemeProvider`).
+
+## Components
+
+shadcn/ui components on Radix, styled only through the theme tokens. Every component accepts
+`className` (merged with `cn`, so your classes win), takes a `ref` (React 19 ref-as-prop) and
+sets a `data-slot` attribute you can target in CSS.
+
+**Basics:** Accordion, Alert, AlertDialog, Avatar, Badge, Breadcrumb, Button, Card, Checkbox,
+Collapsible, Dialog, DropdownMenu, HoverCard, Input, Kbd, Label, Popover, Progress, RadioGroup,
+ScrollArea, Select, Separator, Sheet, Skeleton, Slider, Spinner, Switch, Tabs, Textarea, Toggle,
+ToggleGroup, Tooltip.
+
+```tsx
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@integr8-media/ui';
+
+<Dialog>
+  <DialogTrigger asChild>
+    <Button variant="outline">Edit profile</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Edit profile</DialogTitle>
+      <DialogDescription>Changes are saved when you click Save.</DialogDescription>
+    </DialogHeader>
+  </DialogContent>
+</Dialog>;
+```
+
+- In the Integr8 theme, buttons, badges and tabs are pills and card titles use Unbounded.
+- Overlays animate with [tw-animate-css](https://github.com/Wombosvideo/tw-animate-css), which
+  `theme.css` imports. When the user prefers reduced motion, animations finish at once (the
+  `Spinner` keeps turning).
 
 ## Non-goals
 

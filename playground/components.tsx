@@ -1,8 +1,31 @@
 import '../src/styles/fonts.css';
-import '../src/styles/theme.css';
+import './playground.css';
 import type { GlobalProvider } from '@ladle/react';
-import type { JSX } from 'react';
+import { type JSX, useLayoutEffect } from 'react';
 import { ThemeProvider, type ThemeStorage, useTheme } from '../src';
+
+/**
+ * Ladle writes its own `data-theme` ("light" or "dark") on <html> at startup, even with its
+ * theme addon off, and its effect runs after ThemeProvider's. That replaced "integr8" with
+ * "light". This puts our resolved theme back whenever anything else changes the attribute.
+ * Layout effect, so the old observer is gone before ThemeProvider applies a new theme.
+ */
+function LadleThemeGuard(): null {
+  const { resolvedTheme } = useTheme();
+  useLayoutEffect(() => {
+    const html = document.documentElement;
+    const restore = (): void => {
+      if (html.getAttribute('data-theme') !== resolvedTheme) {
+        html.setAttribute('data-theme', resolvedTheme);
+      }
+    };
+    restore();
+    const observer = new MutationObserver(restore);
+    observer.observe(html, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, [resolvedTheme]);
+  return null;
+}
 
 /** Query parameter that picks the theme, used by the smoke test: `?integr8Theme=dark`. */
 const THEME_PARAM = 'integr8Theme';
@@ -71,6 +94,7 @@ function ThemeToolbar(): JSX.Element {
 
 export const Provider: GlobalProvider = ({ children }) => (
   <ThemeProvider defaultTheme="system" storage={playgroundStorage}>
+    <LadleThemeGuard />
     <div
       style={{
         minHeight: '100vh',
