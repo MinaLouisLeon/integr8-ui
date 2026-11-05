@@ -1,5 +1,5 @@
 // Class names shared by floating content (menus, popovers, hover cards) and menu items.
-// Internal: used by DropdownMenu now and by ContextMenu and Menubar later. Not public API.
+// Internal: used by DropdownMenu, ContextMenu, Menubar and Command. Not public API.
 
 /** Enter/exit animation for content positioned by Radix Popper (reads `data-side`). */
 export const popperAnimation: string = [
@@ -13,8 +13,12 @@ export const popperAnimation: string = [
 export const menuContentClass: string =
   'z-50 min-w-[8rem] overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md';
 
-const svgInItem =
-  "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground";
+// Icons are muted, and take the accent text color while the item is highlighted so they stay
+// readable on the accent background (violet in Integr8).
+const svgInItem = [
+  "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+  "data-[highlighted]:[&_svg:not([class*='text-'])]:text-accent-foreground",
+].join(' ');
 
 /** A plain menu item, with `data-inset` and `data-variant="destructive"` support. */
 export const menuItemClass: string = [
@@ -53,4 +57,8 @@ export const menuLabelClass: string = 'px-2 py-1.5 text-sm font-medium data-[ins
 export const menuSeparatorClass: string = '-mx-1 my-1 h-px bg-border';
 
 /** A keyboard shortcut hint at the right of a menu item. */
-export const menuShortcutClass: string = 'ml-auto text-xs tracking-widest text-muted-foreground';
+export const menuShortcutClass: string = [
+  'ml-auto text-xs tracking-widest text-muted-foreground',
+  // Readable on the accent background of a highlighted menu item or selected command item.
+  'in-data-[highlighted]:text-accent-foreground in-data-[selected=true]:text-accent-foreground',
+].join(' ');

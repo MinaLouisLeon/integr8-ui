@@ -115,15 +115,17 @@ Every theme defines the same CSS variables (shadcn names plus extras):
 
 ## Components
 
-| Group | Components |
-| --- | --- |
-| Basics | Accordion, Alert, AlertDialog, Avatar, Badge, Breadcrumb, Button, Card, Checkbox, Collapsible, Dialog, DropdownMenu, HoverCard, Input, Kbd, Label, Popover, Progress, RadioGroup, ScrollArea, Select, Separator, Sheet, Skeleton, Slider, Spinner, Switch, Tabs, Textarea, Toggle, ToggleGroup, Tooltip |
-| Feedback | Toaster + `toast()` (sonner), EmptyState |
-| Command + menus | Command, CommandDialog (palette), ContextMenu, Menubar, Shortcut (keyboard shortcut display with OS-aware ⌘/Ctrl) |
-| Form kit | Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage; ready fields: TextField, PasswordField, NumberField, TextareaField, SelectField, CheckboxField, SwitchField, RadioField; `useZodForm(schema, options)` |
-| Data table | DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), DataTableToolbar, DataTablePagination, DataTableColumnHeader, DataTableViewOptions |
-| App layout | Sidebar (collapsible, icon-only mode), PageHeader, SplitPanes (react-resizable-panels), StatusBar, Toolbar |
-| Theme | ThemeProvider, ThemeSwitcher, GradientText, GrainOverlay |
+| Group | Components | Status |
+| --- | --- | --- |
+| Basics | ✅ Accordion, ✅ Alert, ✅ AlertDialog, ✅ Avatar, ✅ Badge, ✅ Breadcrumb, ✅ Button, ✅ Card, ✅ Checkbox, ✅ Collapsible, ✅ Dialog, ✅ DropdownMenu, ✅ HoverCard, ✅ Input, ✅ Kbd, ✅ Label, ✅ Popover, ✅ Progress, ✅ RadioGroup, ✅ ScrollArea, ✅ Select, ✅ Separator, ✅ Sheet, ✅ Skeleton, ✅ Slider, ✅ Spinner, ✅ Switch, ✅ Tabs, ✅ Textarea, ✅ Toggle, ✅ ToggleGroup, ✅ Tooltip | ✅ Done (32/32) |
+| Feedback | Toaster + `toast()` (sonner), EmptyState | To do (0/2) |
+| Command + menus | Command, CommandDialog (palette), ContextMenu, Menubar, Shortcut (keyboard shortcut display with OS-aware ⌘/Ctrl) | To do (0/5) |
+| Form kit | Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage; ready fields: TextField, PasswordField, NumberField, TextareaField, SelectField, CheckboxField, SwitchField, RadioField; `useZodForm(schema, options)` | To do |
+| Data table | DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), DataTableToolbar, DataTablePagination, DataTableColumnHeader, DataTableViewOptions | To do (0/5) |
+| App layout | Sidebar (collapsible, icon-only mode), PageHeader, SplitPanes (react-resizable-panels), StatusBar, Toolbar | To do (0/5) |
+| Theme | ✅ ThemeProvider, ThemeSwitcher, GradientText, GrainOverlay | In progress (1/4) |
+
+✅ = built in `src/components/<group>/` (or `src/theme/`), exported from `src/index.ts`, with a unit test and a Ladle story.
 
 - Every component forwards refs, accepts `className`, merges classes with `cn()` (clsx + tailwind-merge) and uses `class-variance-authority` for variants.
 - Accessibility comes from Radix; every interactive component is keyboard-usable and has visible focus (`ring` token).
