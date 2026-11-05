@@ -429,6 +429,80 @@ export { SwitchField, type SwitchFieldProps } from './components/form/SwitchFiel
 export { TextareaField, type TextareaFieldProps } from './components/form/TextareaField';
 export { TextField, type TextFieldProps } from './components/form/TextField';
 export { type UseZodFormOptions, useZodForm } from './components/form/useZodForm';
+// ---------- App layout ----------
+export { PageHeader, type PageHeaderProps } from './components/layout/PageHeader';
+export {
+  Sidebar,
+  type SidebarCollapsible,
+  SidebarContent,
+  type SidebarContentProps,
+  type SidebarContextValue,
+  SidebarError,
+  type SidebarErrorCode,
+  SidebarFooter,
+  type SidebarFooterProps,
+  SidebarGroup,
+  SidebarGroupContent,
+  type SidebarGroupContentProps,
+  SidebarGroupLabel,
+  type SidebarGroupLabelProps,
+  type SidebarGroupProps,
+  SidebarHeader,
+  type SidebarHeaderProps,
+  SidebarInset,
+  type SidebarInsetProps,
+  SidebarMenu,
+  SidebarMenuBadge,
+  type SidebarMenuBadgeProps,
+  SidebarMenuButton,
+  type SidebarMenuButtonProps,
+  type SidebarMenuButtonSize,
+  SidebarMenuItem,
+  type SidebarMenuItemProps,
+  type SidebarMenuProps,
+  type SidebarProps,
+  SidebarProvider,
+  type SidebarProviderProps,
+  SidebarSeparator,
+  type SidebarSeparatorProps,
+  type SidebarSide,
+  type SidebarState,
+  SidebarTrigger,
+  type SidebarTriggerProps,
+  useSidebar,
+} from './components/layout/Sidebar';
+export {
+  SplitPane,
+  type SplitPaneApi,
+  SplitPaneHandle,
+  type SplitPaneHandleProps,
+  type SplitPaneProps,
+  SplitPanes,
+  type SplitPanesApi,
+  type SplitPanesProps,
+} from './components/layout/SplitPanes';
+export {
+  StatusBar,
+  StatusBarItem,
+  type StatusBarItemProps,
+  type StatusBarProps,
+  StatusBarSection,
+  type StatusBarSectionProps,
+} from './components/layout/StatusBar';
+export {
+  Toolbar,
+  ToolbarButton,
+  type ToolbarButtonProps,
+  ToolbarLink,
+  type ToolbarLinkProps,
+  type ToolbarProps,
+  ToolbarSeparator,
+  type ToolbarSeparatorProps,
+  ToolbarToggleGroup,
+  type ToolbarToggleGroupProps,
+  ToolbarToggleItem,
+  type ToolbarToggleItemProps,
+} from './components/layout/Toolbar';
 
 // ---------- Theme and utilities ----------
 export { cn } from './lib/cn';
