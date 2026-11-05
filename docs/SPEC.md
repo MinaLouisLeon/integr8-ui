@@ -115,19 +115,69 @@ Every theme defines the same CSS variables (shadcn names plus extras):
 
 ## Components
 
-| Group | Components |
-| --- | --- |
-| Basics | Accordion, Alert, AlertDialog, Avatar, Badge, Breadcrumb, Button, Card, Checkbox, Collapsible, Dialog, DropdownMenu, HoverCard, Input, Kbd, Label, Popover, Progress, RadioGroup, ScrollArea, Select, Separator, Sheet, Skeleton, Slider, Spinner, Switch, Tabs, Textarea, Toggle, ToggleGroup, Tooltip |
-| Feedback | Toaster + `toast()` (sonner), EmptyState |
-| Command + menus | Command, CommandDialog (palette), ContextMenu, Menubar, Shortcut (keyboard shortcut display with OS-aware ⌘/Ctrl) |
-| Form kit | Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage; ready fields: TextField, PasswordField, NumberField, TextareaField, SelectField, CheckboxField, SwitchField, RadioField; `useZodForm(schema, options)` |
-| Data table | DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), DataTableToolbar, DataTablePagination, DataTableColumnHeader, DataTableViewOptions |
-| App layout | Sidebar (collapsible, icon-only mode), PageHeader, SplitPanes (react-resizable-panels), StatusBar, Toolbar |
-| Theme | ThemeProvider, ThemeSwitcher, GradientText, GrainOverlay |
+| Group | Components | Status |
+| --- | --- | --- |
+| Basics | ✅ Accordion, ✅ Alert, ✅ AlertDialog, ✅ Avatar, ✅ Badge, ✅ Breadcrumb, ✅ Button, ✅ Card, ✅ Checkbox, ✅ Collapsible, ✅ Dialog, ✅ DropdownMenu, ✅ HoverCard, ✅ Input, ✅ Kbd, ✅ Label, ✅ Popover, ✅ Progress, ✅ RadioGroup, ✅ ScrollArea, ✅ Select, ✅ Separator, ✅ Sheet, ✅ Skeleton, ✅ Slider, ✅ Spinner, ✅ Switch, ✅ Tabs, ✅ Textarea, ✅ Toggle, ✅ ToggleGroup, ✅ Tooltip | ✅ Done (32/32) |
+| Feedback | ✅ Toaster + `toast()` (sonner), ✅ EmptyState | ✅ Done (2/2) |
+| Command + menus | ✅ Command, ✅ CommandDialog (palette), ✅ ContextMenu, ✅ Menubar, ✅ Shortcut (keyboard shortcut display with OS-aware ⌘/Ctrl) | ✅ Done (5/5) |
+| Form kit | Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage; ready fields: TextField, PasswordField, NumberField, TextareaField, SelectField, CheckboxField, SwitchField, RadioField; `useZodForm(schema, options)` | To do |
+| Data table | DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), DataTableToolbar, DataTablePagination, DataTableColumnHeader, DataTableViewOptions | To do (0/5) |
+| App layout | Sidebar (collapsible, icon-only mode), PageHeader, SplitPanes (react-resizable-panels), StatusBar, Toolbar | To do (0/5) |
+| Theme | ✅ ThemeProvider, ThemeSwitcher, GradientText, GrainOverlay | In progress (1/4) |
+
+✅ = built in `src/components/<group>/` (or `src/theme/`), exported from `src/index.ts`, with a unit test and a Ladle story.
 
 - Every component forwards refs, accepts `className`, merges classes with `cn()` (clsx + tailwind-merge) and uses `class-variance-authority` for variants.
 - Accessibility comes from Radix; every interactive component is keyboard-usable and has visible focus (`ring` token).
 - Animations respect `prefers-reduced-motion`.
+- Menu-style items (DropdownMenu, ContextMenu, Menubar, Command) highlight with the `accent` token; their icons and shortcut hints switch to `accent-foreground` while highlighted so they stay readable (violet row in Integr8).
+
+### Feedback and Command + menus API
+
+Built in `src/components/feedback/` and `src/components/command/`.
+
+```ts
+// Feedback
+export const toast: typeof import('sonner').toast;   // sonner's toast: success, error, warning, info, loading, promise, dismiss
+export function Toaster(props: ToasterProps): JSX.Element; // all sonner Toaster props
+//  - colors from tokens: popover / popover-foreground / border / radius; type icons use success, info, warning, destructive
+//  - theme: explicit `theme` prop > useTheme().base inside a ThemeProvider > 'system' (follows the OS)
+
+export function EmptyState(props: ComponentProps<'div'> & {
+  title: ReactNode;                     // rendered as a heading
+  description?: ReactNode;
+  icon?: ReactNode;                     // hidden from screen readers
+  headingLevel?: 2 | 3 | 4 | 5 | 6;     // default 3
+  variant?: 'default' | 'outline';      // outline = dashed border; default none
+  children?: ReactNode;                 // actions row
+}): JSX.Element;
+
+// Command + menus
+// Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandSeparator,
+// CommandShortcut: shadcn parts on cmdk.
+export function CommandDialog(props: DialogProps & {
+  title?: string;                       // sr-only, default 'Command palette'
+  description?: string;                 // sr-only, default 'Search for a command to run.'
+  className?: string;                   // dialog window
+  showCloseButton?: boolean;            // default false (Esc closes)
+  commandProps?: Omit<CommandProps, 'children'>; // e.g. loop, filter, shouldFilter
+}): JSX.Element;
+// ContextMenu* and Menubar*: shadcn parts on Radix, same item API as DropdownMenu
+// (inset, variant 'default' | 'destructive', checkbox/radio items, submenus, *Shortcut).
+
+export function Shortcut(props: ComponentProps<'span'> & {
+  keys: string | readonly string[];     // 'mod+shift+p' or ['mod', 'k']; a trailing '+' is the plus key
+  variant?: 'kbd' | 'text';             // default 'kbd' (one Kbd per key); 'text' for menu items
+  platform?: 'mac' | 'other';           // default: detected; server render uses 'other'
+}): JSX.Element;
+export function formatShortcut(keys: string | readonly string[], platform: 'mac' | 'other'):
+  { keys: string[]; text: string; label: string }; // ['⌘','⇧','P'], '⌘⇧P', 'Command+Shift+P'
+export function detectShortcutPlatform(): 'mac' | 'other';
+```
+
+- `mod` is ⌘ on macOS/iOS/iPadOS and Ctrl elsewhere. Other key names: `ctrl`, `alt`/`option`, `shift`, `meta`/`cmd`/`win`, `enter`, `esc`, `tab`, `space`, `backspace`, `delete`, `up`/`down`/`left`/`right`, `pageup`, `pagedown`, `home`, `end`, `plus`. Single letters and `f1`–`f24` are upper-cased; anything else is shown as written; keys keep the given order.
+- Apple style joins keys without a separator (`⌘⇧P`); the other style joins with `+` (`Ctrl+Shift+P`). Screen readers get the spoken form (`Command+Shift+P`).
+- Shortcut, `CommandShortcut` and the menu `*Shortcut` parts are display only; they do not bind keys.
 
 ## Folder layout
 
@@ -171,7 +221,7 @@ export function App() {
 
 ## Tests and playground
 
-- Unit tests (Vitest, jsdom): ThemeProvider (system resolution and live OS change, storage adapter, `data-theme` and `dark` class, custom themes), `getThemeScript`, `defineTheme` fallbacks, `cn`, `useZodForm`, DataTable sorting/filtering/pagination logic. 80% line coverage on `src/theme`, `src/lib` and logic hooks.
+- Unit tests (Vitest, jsdom): ThemeProvider (system resolution and live OS change, storage adapter, `data-theme` and `dark` class, custom themes), `getThemeScript`, `defineTheme` fallbacks, `cn`, `formatShortcut` and platform detection, `useZodForm`, DataTable sorting/filtering/pagination logic. 80% line coverage on `src/theme`, `src/lib` and logic hooks.
 - Ladle: one story file per component in `playground/`, with a toolbar to switch Light / Dark / System / Integr8.
 - `playground:smoke`: Playwright opens every story in light, dark and integr8 and fails on console errors.
 - size-limit budgets (initial): `import { Button }` ≤ 12 kB gzip; `styles.css` ≤ 60 kB gzip.
@@ -192,3 +242,4 @@ export function App() {
 - Integr8 is dark-only like the website. Add a light Integr8 variant later?
 - The three added colors (destructive `#ff5470`, success `#3ddc97`, warning `#ffb547`) are new; keep or change?
 - Size budgets are first guesses; adjust after the first build.
+- `formatShortcut` and `detectShortcutPlatform` are exported beyond the original component list (for tooltips and aria labels). Keep public or make internal?

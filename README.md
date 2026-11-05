@@ -157,6 +157,22 @@ Collapsible, Dialog, DropdownMenu, HoverCard, Input, Kbd, Label, Popover, Progre
 ScrollArea, Select, Separator, Sheet, Skeleton, Slider, Spinner, Switch, Tabs, Textarea, Toggle,
 ToggleGroup, Tooltip.
 
+**Feedback:** Toaster + `toast()` (sonner, colored by the theme tokens and following the
+resolved theme), EmptyState.
+
+**Command + menus:** Command and CommandDialog (cmdk, for a ⌘K palette), ContextMenu, Menubar,
+and Shortcut, which shows a shortcut in the user's OS style (`⌘⇧P` on Apple devices,
+`Ctrl+Shift+P` elsewhere). `formatShortcut(keys, platform)` gives the same labels as strings.
+
+```tsx
+import { Shortcut, Toaster, toast } from '@integr8-media/ui';
+
+<Shortcut keys="mod+shift+p" />;              // ⌘ ⇧ P  or  Ctrl Shift P
+<Shortcut keys="mod+s" variant="text" />;     // ⌘S     or  Ctrl+S (for menu items)
+
+toast.success('Saved'); // needs one <Toaster /> mounted near the app root
+```
+
 ```tsx
 import {
   Button,
