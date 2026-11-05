@@ -122,7 +122,7 @@ Every theme defines the same CSS variables (shadcn names plus extras):
 | Command + menus | ✅ Command, ✅ CommandDialog (palette), ✅ ContextMenu, ✅ Menubar, ✅ Shortcut (keyboard shortcut display with OS-aware ⌘/Ctrl) | ✅ Done (5/5) |
 | Form kit | ✅ Form, ✅ FormField, ✅ FormItem, ✅ FormLabel, ✅ FormControl, ✅ FormDescription, ✅ FormMessage; ready fields: ✅ TextField, ✅ PasswordField, ✅ NumberField, ✅ TextareaField, ✅ SelectField, ✅ CheckboxField, ✅ SwitchField, ✅ RadioField; ✅ `useZodForm(schema, options)` | ✅ Done (16/16) |
 | Data table | ✅ DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), ✅ DataTableToolbar, ✅ DataTablePagination, ✅ DataTableColumnHeader, ✅ DataTableViewOptions | ✅ Done (5/5) |
-| App layout | Sidebar (collapsible, icon-only mode), PageHeader, SplitPanes (react-resizable-panels), StatusBar, Toolbar | To do (0/5) |
+| App layout | ✅ Sidebar (collapsible, icon-only mode), ✅ PageHeader, ✅ SplitPanes (react-resizable-panels), ✅ StatusBar, ✅ Toolbar | ✅ Done (5/5) |
 | Theme | ✅ ThemeProvider, ThemeSwitcher, GradientText, GrainOverlay | In progress (1/4) |
 
 ✅ = built in `src/components/<group>/` (or `src/theme/`), exported from `src/index.ts`, with a unit test and a Ladle story.
@@ -305,6 +305,71 @@ type DataTableVirtualRowsHook<TData> = (
 - With `useVirtualRows`, the body renders only the returned rows between two spacer rows and the header becomes sticky. The hook is called on every render; pass the same hook for the table's whole life.
 - The table markup (`table`, `thead`, `tr`, `th`, `td`) is internal; there are no exported `Table*` primitives.
 
+### App layout API
+
+Built in `src/components/layout/`. SplitPanes uses react-resizable-panels **v4** (`^4.0.0`).
+
+```ts
+// Sidebar (shadcn pattern, colors from existing tokens: card, muted, accent)
+export function SidebarProvider(props: ComponentProps<'div'> & {
+  defaultOpen?: boolean;                // default true (desktop)
+  open?: boolean; onOpenChange?: (open: boolean) => void; // controlled, e.g. to save it
+  keyboardShortcut?: string | false;    // default 'b' → ⌘B / Ctrl+B toggles; false = off
+}): JSX.Element; // row wrapper; sets --sidebar-width (16rem) and --sidebar-width-icon (3rem)
+export function useSidebar(): {
+  state: 'expanded' | 'collapsed'; open; setOpen; openMobile; setOpenMobile;
+  isMobile: boolean;                    // below 768px
+  toggleSidebar(): void;
+};
+export class SidebarError extends Error { code: 'NO_SIDEBAR_PROVIDER' }
+export function Sidebar(props: ComponentProps<'div'> & {
+  side?: 'left' | 'right';              // default 'left'
+  collapsible?: 'icon' | 'offcanvas' | 'none'; // default 'icon'
+  mobileTitle?: string;                 // sr-only title of the mobile sheet, default 'Sidebar'
+}): JSX.Element;
+export function SidebarTrigger(props: ButtonProps & { label?: string }): JSX.Element; // default 'Toggle sidebar'
+export function SidebarMenuButton(props: ComponentProps<'button'> & {
+  asChild?: boolean; isActive?: boolean; // active: accent colors + aria-current="page"
+  size?: 'default' | 'sm' | 'lg';
+  tooltip?: ReactNode;                  // shown only while collapsed to icons
+}): JSX.Element;
+// Plain parts: SidebarInset (<main>), SidebarHeader, SidebarContent (scrolls), SidebarFooter,
+// SidebarSeparator, SidebarGroup, SidebarGroupLabel (asChild), SidebarGroupContent,
+// SidebarMenu (<ul>), SidebarMenuItem (<li>), SidebarMenuBadge.
+
+export function PageHeader(props: Omit<ComponentProps<'header'>, 'title'> & {
+  title: ReactNode; description?: ReactNode;
+  breadcrumb?: ReactNode;               // above the title
+  actions?: ReactNode;                  // end of the title row
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6; // default 1
+  children?: ReactNode;                 // under the title row (e.g. Tabs)
+}): JSX.Element;
+
+// SplitPanes: react-resizable-panels v4 Group / Panel / Separator, all props passed through
+export function SplitPanes(props: GroupProps): JSX.Element;  // orientation default 'horizontal'
+export function SplitPane(props: PanelProps): JSX.Element;
+export function SplitPaneHandle(props: SeparatorProps & { withGrip?: boolean }): JSX.Element;
+export type SplitPanesApi = GroupImperativeHandle;  // groupRef: getLayout, setLayout
+export type SplitPaneApi = PanelImperativeHandle;   // panelRef: collapse, expand, isCollapsed, getSize, resize
+
+export function StatusBar(props: ComponentProps<'footer'>): JSX.Element;
+export function StatusBarSection(props: ComponentProps<'div'> & { align?: 'start' | 'end' }): JSX.Element;
+export function StatusBarItem(props: ComponentProps<'span'> & { asChild?: boolean }): JSX.Element;
+
+// Toolbar: Radix Toolbar (one Tab stop, arrow keys between items)
+export function Toolbar(props: ToolbarRootProps): JSX.Element;
+export function ToolbarButton(props: ToolbarButtonProps & { variant?: ButtonVariant; size?: ButtonSize }): JSX.Element; // default ghost, sm
+export function ToolbarToggleItem(props: ToggleItemProps & { variant?: ToggleVariant; size?: ToggleSize }): JSX.Element; // default sm
+// ToolbarLink, ToolbarSeparator, ToolbarToggleGroup: Radix parts with styles.
+```
+
+- Desktop: the sidebar animates its width; `icon` keeps a 3rem strip (labels, group labels and badges hide, tooltips name the icons), `offcanvas` shrinks to 0 and becomes `inert`. Below 768px it renders as a `Sheet` opened by `SidebarTrigger`.
+- `SidebarProvider` fills the viewport (`min-h-svh`) and the sidebar is sticky at full height. Inside a box (an IDE window), give the provider `className="h-full min-h-0"`; the sidebar clamps to it.
+- No new tokens: sidebar background is `card`, hover `muted`, active item `accent` / `accent-foreground` (violet row in Integr8, like the menus).
+- SplitPanes sizes follow v4: numbers are **pixels**, strings take units (`'25%'`, `'16rem'`, `'200px'`; a unitless string is a percentage). Remember layouts by saving `onLayoutChange` and passing it back as `defaultLayout`.
+- `SplitPaneHandle` is a vertical line between side-by-side panes and a horizontal line between stacked panes; it turns `ring` while hovered, focused or dragged.
+- `StatusBar` is not a live region; values that must be announced go in the app's own `role="status"` element. Clickable items use `asChild` with a `<button>`.
+
 ## Folder layout
 
 ```
@@ -375,3 +440,8 @@ export function App() {
 - Data table exports beyond the original list: the types `DataTableColumnDef`, `DataTableInstance`, `DataTableLabels`, `DataTableVirtualRow`, `DataTableVirtualRows`, `DataTableVirtualRowsHook`, and every `*Props` type. The props listed in the Data table API were not named in the original spec. Keep or change?
 - No faceted filter (shadcn's per-column multi-select with counts) and no exported `Table*` primitives in v1. Add them?
 - Data table stories are one file, `playground/data-table/DataTable.stories.tsx` (default, row selection, custom toolbar, server-side, empty, translated labels, 10,000 virtualized rows), not one file per part. Split them?
+- App layout: the original spec named only the five components. The part names (`Sidebar*`, `SplitPane`/`SplitPaneHandle`, `StatusBarSection`/`StatusBarItem`, `Toolbar*`), `useSidebar`, `SidebarError`, the `SplitPanesApi`/`SplitPaneApi` types, every `*Props` type and all props in the App layout API are new. Keep or change?
+- Sidebar v1 leaves out shadcn's `SidebarMenuSub*`, `SidebarMenuAction`, `SidebarRail`, `SidebarInput`, the `floating`/`inset` variants and cookie persistence (use `open`/`onOpenChange`). Add any of them?
+- Sidebar uses existing tokens instead of shadcn's `sidebar-*` tokens. Add dedicated sidebar tokens (a token change)?
+- SplitPanes targets react-resizable-panels v4, where bare numbers mean pixels (v3 meant percent). OK?
+- An `AppShell.stories.tsx` story combines all five pieces, in addition to one story file per component.
