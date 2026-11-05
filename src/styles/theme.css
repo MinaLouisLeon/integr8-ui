@@ -1,0 +1,192 @@
+/*
+ * @integr8-media/ui — Tailwind v4 preset.
+ *
+ * Use it after Tailwind:
+ *   @import "tailwindcss";
+ *   @import "@integr8-media/ui/theme.css";
+ *
+ * Token values must match src/theme/themes/*.ts (a unit test checks this).
+ */
+
+/* Let Tailwind see the classes used by the package's built files (dist/). */
+@source "./**/*.mjs";
+
+/* `dark:` applies inside any element with the `dark` class (set by ThemeProvider). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- Light (also the default before a theme is applied) ---------- */
+:root,
+[data-theme="light"] {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.541 0.281 293.009);
+  --primary-foreground: oklch(0.969 0.016 293.756);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.943 0.029 294.588);
+  --accent-foreground: oklch(0.38 0.189 293.745);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.627 0.194 149.214);
+  --warning: oklch(0.769 0.188 70.08);
+  --info: oklch(0.588 0.158 241.966);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.606 0.25 292.717);
+  --brand-1: #7c5cff;
+  --brand-2: #22d3ee;
+  --brand-3: #c6ff3d;
+  --brand-4: #ff4fd8;
+  --radius: 0.625rem;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+
+/* ---------- Dark ---------- */
+[data-theme="dark"] {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.606 0.25 292.717);
+  --primary-foreground: oklch(0.969 0.016 293.756);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.283 0.141 291.089);
+  --accent-foreground: oklch(0.943 0.029 294.588);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.145 0 0);
+  --success: oklch(0.723 0.219 149.579);
+  --warning: oklch(0.828 0.189 84.429);
+  --info: oklch(0.746 0.16 232.661);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.702 0.183 293.541);
+  --brand-1: #7c5cff;
+  --brand-2: #22d3ee;
+  --brand-3: #c6ff3d;
+  --brand-4: #ff4fd8;
+  --radius: 0.625rem;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: dark;
+}
+
+/* ---------- Integr8 (from integr8-media.com) ---------- */
+[data-theme="integr8"] {
+  --background: #07060b;
+  --foreground: #f4f2ff;
+  --card: #100e18;
+  --card-foreground: #f4f2ff;
+  --popover: #100e18;
+  --popover-foreground: #f4f2ff;
+  --primary: #c6ff3d;
+  --primary-foreground: #07060b;
+  --secondary: #100e18;
+  --secondary-foreground: #f4f2ff;
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: #9a96b0;
+  --accent: #7c5cff;
+  --accent-foreground: #f4f2ff;
+  --destructive: #ff5470;
+  --destructive-foreground: #07060b;
+  --success: #3ddc97;
+  --warning: #ffb547;
+  --info: #22d3ee;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #7c5cff;
+  --brand-1: #7c5cff;
+  --brand-2: #22d3ee;
+  --brand-3: #c6ff3d;
+  --brand-4: #ff4fd8;
+  --radius: 1rem;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Unbounded", "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: dark;
+}
+
+/* ---------- Tailwind mapping: bg-primary, text-muted-foreground, rounded-lg, font-display ... ---------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-1: var(--brand-1);
+  --color-brand-2: var(--brand-2);
+  --color-brand-3: var(--brand-3);
+  --color-brand-4: var(--brand-4);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /*
+   * The font tokens share their names with Tailwind's font theme variables, so these lines
+   * only register the `font-sans`, `font-display` and `font-mono` utilities. The values come
+   * from the theme blocks above, which are unlayered and win over Tailwind's theme layer.
+   */
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+/* ---------- Base styles ---------- */
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+
+  /* Integr8 extras: display font on headings and lime text selection. */
+  [data-theme="integr8"] :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-display);
+  }
+
+  [data-theme="integr8"] ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
