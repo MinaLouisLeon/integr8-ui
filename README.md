@@ -4,20 +4,48 @@ The design system for every `@integr8-media` app: shadcn/ui components on Radix 
 theme engine with five built-in themes (Light, Dark, System, Integr8, Integr8 Light), a form kit,
 a data table, a command palette and app layout pieces.
 
+**Website: <https://minalouisleon.github.io/integr8-ui/>** — setup steps, a searchable list of
+every item, live previews in every theme, and a documentation page for each item (preview,
+installation, usage, API reference and source).
+
 The full spec is in [docs/SPEC.md](docs/SPEC.md). The API reference is generated from TSDoc with
 `npm run docs` (output in `docs/api/`).
 
 ## Requirements
 
 - React 19
-- Tailwind CSS v4 (only for apps that use the Tailwind preset)
+- Tailwind CSS v4 (only for apps that use the Tailwind preset, and for the shadcn registry)
 - Node 24 LTS for tooling
 
 ## Install
 
+There are two ways to use the design system:
+
+| | npm package | shadcn registry (the website's method) |
+| --- | --- | --- |
+| How | `npm install @integr8-media/ui` | `npx shadcn@latest add <item URL>` |
+| You get | Built components you import from `@integr8-media/ui` | The source of only the items you pick, copied into your app |
+| Updates | Bump the package version | Run `shadcn add` again (it asks before overwriting your changes) |
+| Styling | `theme.css` (Tailwind v4) or the prebuilt `styles.css` (no Tailwind) | Tailwind v4 with the tokens written into your CSS |
+| Best for | Apps that want the whole kit and easy upgrades | Apps that want to change the code or keep the bundle small |
+
+### npm package
+
 ```sh
 npm install @integr8-media/ui
 ```
+
+Then follow [Setup](#setup).
+
+### shadcn registry
+
+```sh
+npx shadcn@latest init                                                          # skip if you have components.json
+npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/theme.json   # once per project
+npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/button.json  # any item
+```
+
+See [shadcn registry](#shadcn-registry) for short names, the item list and what gets copied.
 
 ## Setup
 
@@ -314,15 +342,59 @@ Sidebar, PageHeader, SplitPanes (react-resizable-panels v4), StatusBar and Toolb
 ## shadcn registry
 
 Like shadcn/ui, an app can copy in only the components it needs, with no npm package to
-install. The registry is hosted at <https://minalouisleon.github.io/integr8-ui/>.
+install. The registry and its website are hosted at <https://minalouisleon.github.io/integr8-ui/>.
 
-```sh
-npx shadcn@latest init                                                          # a shadcn project with Tailwind v4
-npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/theme.json   # once: tokens, themes, ThemeProvider, fonts
-npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/button.json
-```
+| Address | What it is |
+| --- | --- |
+| [`/`](https://minalouisleon.github.io/integr8-ui/) | Landing page: setup steps, live preview, searchable item list with copy buttons |
+| `/components/<name>/` | One page per item, for example [`/components/button/`](https://minalouisleon.github.io/integr8-ui/components/button/) |
+| `/r/<name>.json` | The item files `shadcn add` reads; `/r/registry.json` lists them all |
+| `/playground/` | The Ladle playground the previews come from |
 
-Shorter names: add the registry to `components.json`, then `npx shadcn@latest add @integr8/button`.
+### Get started
+
+Works in any React 19 app set up for shadcn/ui with Tailwind v4: Next.js, Vite, React Router.
+
+1. **Set up shadcn.** Skip this if the project already has a `components.json`.
+
+   ```sh
+   npx shadcn@latest init
+   ```
+
+2. **Add the theme.** Once per project: the tokens of all five themes, `ThemeProvider` and the
+   fonts.
+
+   ```sh
+   npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/theme.json
+   ```
+
+3. **Add components.** Each one brings the parts it needs. The code is yours to change.
+
+   ```sh
+   npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/button.json
+   ```
+
+4. **Wrap the app** in the copied provider. The theme follows the OS by default; Integr8,
+   Integr8 Light, Light and Dark are built in.
+
+   ```tsx
+   import { ThemeProvider } from '@/lib/theme/ThemeProvider';
+   import { ThemeSwitcher } from '@/components/ui/theme-switcher';
+
+   export function App() {
+     return (
+       <ThemeProvider defaultTheme="integr8">
+         <ThemeSwitcher />
+       </ThemeProvider>
+     );
+   }
+   ```
+
+   For SSR apps, put `getThemeScript()` from `@/lib/theme/themeScript` in `<head>` to avoid a
+   theme flash (see [No flash in server-rendered apps](#no-flash-in-server-rendered-apps)).
+
+**Shorter names:** add the registry to `components.json`, then run
+`npx shadcn@latest add @integr8/button`.
 
 ```json
 {
@@ -332,34 +404,52 @@ Shorter names: add the registry to `components.json`, then `npx shadcn@latest ad
 }
 ```
 
-Then wrap the app in the copied provider:
+### Items
 
-```tsx
-import { ThemeProvider } from '@/lib/theme/ThemeProvider';
-import { ThemeSwitcher } from '@/components/ui/theme-switcher';
-```
+71 items (62 components) in the same groups as the website. Item names are the kebab-case file
+names; each one is at `/r/<name>.json` and documented at `/components/<name>/`.
+
+| Group | Items |
+| --- | --- |
+| Basics | `accordion`, `alert`, `alert-dialog`, `avatar`, `badge`, `breadcrumb`, `button`, `card`, `checkbox`, `collapsible`, `dialog`, `dropdown-menu`, `hover-card`, `input`, `kbd`, `label`, `popover`, `progress`, `radio-group`, `scroll-area`, `select`, `separator`, `sheet`, `skeleton`, `slider`, `spinner`, `switch`, `tabs`, `textarea`, `toggle`, `toggle-group`, `tooltip`; helper `floating-styles` |
+| Feedback | `empty-state`, `toaster` |
+| Command & menus | `command`, `context-menu`, `menubar`, `shortcut`; helper `shortcut-keys` |
+| Form kit | `form`, `text-field`, `password-field`, `number-field`, `textarea-field`, `select-field`, `checkbox-field`, `switch-field`, `radio-field`; hook `use-zod-form`; helper `field-base` |
+| Data table | `data-table`, `data-table-column-header`, `data-table-faceted-filter`, `data-table-pagination`, `data-table-toolbar`, `data-table-view-options`, `table`; helpers `data-table-features`, `data-table-labels` |
+| App layout | `page-header`, `sidebar`, `split-panes`, `status-bar`, `toolbar` |
+| Theme | `theme`, `fonts`, `theme-switcher`, `gradient-text`, `grain-overlay` |
+| Utilities | `utils` (`cn`) |
+
+### What gets copied
 
 - `theme` copies the theme engine to `@/lib/theme/` and writes the tokens of all five themes into
   your CSS (Light and Dark into your `:root` and `.dark` blocks). It also adds `fonts`
   (Inter, JetBrains Mono, Unbounded from Fontsource, no Google Fonts requests).
-- Item names are the kebab-case file names: `data-table`, `sidebar`, `theme-switcher`, ...
 - Copied components import `cn` from `@/lib/utils`, each other from `@/components/ui/*` and the
-  theme from `@/lib/theme/*`; `shadcn add` installs what an item needs.
+  theme from `@/lib/theme/*`; `shadcn add` installs the npm packages and other items an item
+  needs. Each item's page lists them under Installation (npm packages, also adds, files).
+- Needs a shadcn CLI recent enough for `@lib/` target placeholders: use `shadcn@latest`.
+- The items are also in the npm package under `@integr8-media/ui/registry/*`.
+
+### Maintaining the website
+
 - Items are generated from the same source files (`npm run build:registry`, config in
   `registry/registry.config.mjs`). `npm run build:registry-site` builds the site into `site/`:
   the landing page (`scripts/registryPage.mjs`, styled like integr8-media.com), the JSON in
-  `r/` and, when they are built, the fonts and the Ladle playground. The page lists every item
-  with search and copy buttons, and shows live previews from the playground.
-- Every item also gets a documentation page at `components/<name>/` (`scripts/itemPage.mjs`):
-  live preview of its stories in every theme, installation, usage, an API reference built from
-  the TSDoc comments (`scripts/sourceDocs.mjs`), and its source. Good TSDoc in `src/` is the
-  documentation: describe each export and prop, write defaults as "Default `x`", add
-  `@example` blocks, and mark non-public exports `@internal`.
+  `r/` and, when they are built, the fonts and the Ladle playground. `npm run site` builds
+  everything and serves it on <http://localhost:4173>.
+- Item pages come from `scripts/itemPage.mjs`; the API reference on them is read from the TSDoc
+  comments by `scripts/sourceDocs.mjs`. Good TSDoc in `src/` is the documentation: describe each
+  export and prop, write defaults as "Default `x`", add `@example` blocks (the first one becomes
+  the Usage section), and mark non-public exports `@internal`.
+- The site groups items by their `categories` (the `src/components/<group>` folder, `lib` for
+  helpers, `theme` for `theme` and `fonts`). Previews embed playground stories with
+  `?integr8Embed=1`, which hides the playground's theme toolbar.
 - `.github/workflows/registry.yml` builds the fonts, the playground and the registry, and deploys
-  `site/` to GitHub Pages on every push to `main`. To move the site (for example to a section of
-  the website), set the `REGISTRY_BASE_URL` (URL of the `r/` folder) and `SITE_BASE_PATH` (path
-  the site is served from, such as `/ui/`) repository variables.
-- The items are also in the npm package under `@integr8-media/ui/registry/*`.
+  `site/` to GitHub Pages on every push to `main`. Setup once: repo Settings → Pages → Source:
+  "GitHub Actions". To move the site (for example to a section of integr8-media.com), set the
+  `REGISTRY_BASE_URL` (URL of the `r/` folder, such as `https://integr8-media.com/ui/r`) and
+  `SITE_BASE_PATH` (path the site is served from, such as `/ui/`) repository variables.
 
 ## Non-goals
 
