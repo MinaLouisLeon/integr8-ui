@@ -253,6 +253,49 @@ Ready fields: TextField, PasswordField, NumberField, TextareaField, SelectField,
 SwitchField, RadioField. For a custom control, use the parts: FormField, FormItem, FormLabel,
 FormControl, FormDescription, FormMessage.
 
+### Date and time
+
+Built on react-day-picker `^9` and date-fns. `Calendar` is the month grid (single, multiple or
+range; display-only without a selection). `TimeInput` is a segmented time field. The pickers
+take typed input as well as clicks: text is parsed on blur or Enter, and text that is not a date
+(or a disabled or out-of-range day) is flagged with `aria-invalid` and never changes the value.
+Esc restores the last valid text, Alt+ArrowDown opens the calendar, and ArrowUp/ArrowDown move the
+date by a day (Shift: a month).
+
+```tsx
+import {
+  Calendar, DatePicker, DateRangePicker, DateTimePicker, DateTimeRangePicker, TimeInput,
+  rangePresets,
+} from '@integr8-media/ui';
+
+<Calendar />                                                    // display-only, today highlighted
+<DatePicker value={due} onChange={setDue} clearable />          // type "11/06/2026" or pick
+<DateRangePicker value={range} onChange={setRange} presets={rangePresets} />
+<DateTimePicker value={meeting} onChange={setMeeting} minuteStep={15} />
+<DateTimeRangePicker value={shift} onChange={setShift} minuteStep={15} />
+<TimeInput value={time} onChange={setTime} hourCycle={24} />
+```
+
+- `value` is `null` for empty and `undefined` for an uncontrolled picker. Ranges are
+  `{ from, to }`; date-time values are `Date`s that carry the time.
+- Display patterns follow the locale: `P` for dates and `Pp` for date-times
+  (`11/06/2026, 3:30 PM` in en-US). Set `format`, and `parseFormats` for the extra patterns typed
+  text may use (default: ISO `yyyy-MM-dd` and `yyyy-MM-dd HH:mm`). `parseDateInput(text, options)`
+  is exported for your own inputs.
+- `disabled` turns a picker off; `disabledDays` takes the calendar's matchers (dates, ranges,
+  weekdays, functions). `fromDate` / `toDate` (and `min` / `max` for date-times, to the minute)
+  limit what can be picked or typed.
+- `allowTyping={false}` shows a plain button instead of the input.
+- `rangePresets` (today, last 7 days, last 30 days, this month, last month) or your own list
+  `{ label, range: () => DateRange }[]` go in `presets`. The date-time range picker gives preset
+  days `defaultFromTime` (00:00) and `defaultToTime` (23:59).
+- `TimePicker` is a `TimeInput` with a clock button that opens lists of hours, minutes, seconds
+  and AM/PM (`TimePickerField` for forms). It takes the `TimeInput` props.
+- Fields: `DateField`, `DateRangeField`, `DateTimeField`, `DateTimeRangeField`, `TimeField`. They
+  store `Date`, `{ from, to }` or `Time` (`undefined` when empty), so `z.date()` and
+  `z.object({ from: z.date(), to: z.date() })` validate them. Text that was not accepted shows as
+  the field's message.
+
 ### Data table
 
 On TanStack Table **v9**: sorting, search, column filters, faceted filters, pagination, column
@@ -412,6 +455,7 @@ names; each one is at `/r/<name>.json` and documented at `/components/<name>/`.
 | Feedback | `empty-state`, `toaster` |
 | Command & menus | `command`, `context-menu`, `menubar`, `shortcut`; helper `shortcut-keys` |
 | Form kit | `form`, `text-field`, `password-field`, `number-field`, `textarea-field`, `select-field`, `checkbox-field`, `switch-field`, `radio-field`; hook `use-zod-form`; helper `field-base` |
+| Date and time | `calendar`, `time-input`, `date-picker`, `date-range-picker`, `date-time-picker`, `date-time-range-picker`, `date-field`, `date-range-field`, `date-time-field`, `date-time-range-field`, `time-field`, `time-picker`, `time-picker-field`; helpers `time`, `parse-date-input`, `range-presets`, `date-input-shared` |
 | Data table | `data-table`, `data-table-column-header`, `data-table-faceted-filter`, `data-table-pagination`, `data-table-toolbar`, `data-table-view-options`, `table`; helpers `data-table-features`, `data-table-labels` |
 | App layout | `page-header`, `sidebar`, `split-panes`, `status-bar`, `toolbar` |
 | Theme | `theme`, `fonts`, `theme-switcher`, `gradient-text`, `grain-overlay` |
