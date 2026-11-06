@@ -1,6 +1,6 @@
 'use client';
 
-import type { Column } from '@tanstack/react-table';
+import type { RowData } from '@tanstack/react-table';
 import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon, EyeOffIcon } from 'lucide-react';
 import type { ComponentProps, JSX } from 'react';
 import { cn } from '../../lib/cn';
@@ -12,12 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../basics/DropdownMenu';
+import type { DataTableColumn } from './dataTableFeatures';
 import { useDataTableLabels } from './dataTableLabels';
 
 /** Props for {@link DataTableColumnHeader}. */
-export type DataTableColumnHeaderProps<TData, TValue> = ComponentProps<'div'> & {
+export type DataTableColumnHeaderProps<TData extends RowData, TValue> = ComponentProps<'div'> & {
   /** The column, from the header context: `header: ({ column }) => ...`. */
-  column: Column<TData, TValue>;
+  column: DataTableColumn<TData, TValue>;
   /** The visible header text. */
   title: string;
 };
@@ -37,7 +38,7 @@ export type DataTableColumnHeaderProps<TData, TValue> = ComponentProps<'div'> & 
  * ];
  * ```
  */
-export function DataTableColumnHeader<TData, TValue>({
+export function DataTableColumnHeader<TData extends RowData, TValue>({
   column,
   title,
   className,

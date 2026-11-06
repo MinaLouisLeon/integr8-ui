@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 // Opens every story in each theme and fails on console errors or uncaught exceptions.
 // The theme comes from the `integr8Theme` query parameter (see playground/components.tsx).
-const THEMES = ['light', 'dark', 'integr8'] as const;
+const THEMES = ['light', 'dark', 'integr8', 'integr8-light'] as const;
 
 interface LadleMeta {
   stories: Record<string, unknown>;

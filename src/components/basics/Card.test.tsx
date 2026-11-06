@@ -44,6 +44,6 @@ describe('Card', () => {
 
   it('gives the title the display font in the Integr8 theme', () => {
     render(<CardTitle>Hello</CardTitle>);
-    expect(screen.getByText('Hello').className).toContain('in-data-[theme=integr8]:font-display');
+    expect(screen.getByText('Hello').className).toContain('integr8:font-display');
   });
 });

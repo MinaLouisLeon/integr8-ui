@@ -30,8 +30,9 @@ const UNSAFE_VALUE = /[{};<>]/;
  * `radius` win over the same tokens in `tokens`.
  *
  * @throws {@link ThemeError} with code `INVALID_THEME` when the name is not lowercase
- * letters, digits and dashes, is reserved (`light`, `dark`, `system`, `integr8`), the label is
- * empty, the base is unknown, a token name is unknown, or a value is empty or unsafe.
+ * letters, digits and dashes, is reserved (`light`, `dark`, `system`, `integr8`,
+ * `integr8-light`), the label is empty, the base is unknown, a token name is unknown, or a
+ * value is empty or unsafe.
  *
  * @example
  * ```ts

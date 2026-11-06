@@ -1,124 +1,24 @@
 import type { Story } from '@ladle/react';
-import { MoreHorizontalIcon, TableIcon } from 'lucide-react';
+import type { RowSelectionState } from '@tanstack/react-table';
+import { TableIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Badge,
-  Button,
   DataTable,
-  type DataTableColumnDef,
-  DataTableColumnHeader,
   DataTablePagination,
   DataTableToolbar,
   type DataTableVirtualRow,
   type DataTableVirtualRows,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
   EmptyState,
   Toaster,
-  ToggleGroup,
-  ToggleGroupItem,
-  toast,
 } from '../../src';
-
-type Status = 'todo' | 'in-progress' | 'done' | 'canceled';
-
-interface Task {
-  id: string;
-  title: string;
-  status: Status;
-  priority: 'low' | 'medium' | 'high';
-  estimate: number;
-}
-
-const TITLES = [
-  'Wire the theme switcher',
-  'Write the registry generator',
-  'Fix focus ring in Select',
-  'Add Sidebar icon-only mode',
-  'Measure styles.css size',
-  'Document the form kit',
-  'Smoke test every story',
-  'Review DataTable labels',
-];
-const STATUSES: Status[] = ['todo', 'in-progress', 'done', 'canceled'];
-const PRIORITIES: Task['priority'][] = ['low', 'medium', 'high'];
-
-function makeTasks(count: number): Task[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `TASK-${1000 + i}`,
-    title: `${TITLES[i % TITLES.length]}`,
-    status: STATUSES[(i * 3) % STATUSES.length] ?? 'todo',
-    priority: PRIORITIES[(i * 5) % PRIORITIES.length] ?? 'low',
-    estimate: 1 + ((i * 7) % 13),
-  }));
-}
-
-const statusVariant = {
-  todo: 'outline',
-  'in-progress': 'secondary',
-  done: 'default',
-  canceled: 'destructive',
-} as const;
-
-const columns: DataTableColumnDef<Task>[] = [
-  {
-    accessorKey: 'id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Task" />,
-    cell: ({ row }) => <span className="font-mono text-xs">{row.original.id}</span>,
-  },
-  {
-    accessorKey: 'title',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Title" />,
-  },
-  {
-    accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-    cell: ({ row }) => (
-      <Badge variant={statusVariant[row.original.status]}>{row.original.status}</Badge>
-    ),
-  },
-  {
-    accessorKey: 'priority',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Priority" />,
-  },
-  {
-    accessorKey: 'estimate',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Estimate (h)" />,
-    cell: ({ row }) => <div className="text-right tabular-nums">{row.original.estimate}</div>,
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${row.original.id}`}>
-            <MoreHorizontalIcon />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{row.original.id}</DropdownMenuLabel>
-          <DropdownMenuItem onSelect={() => toast(`Copied ${row.original.id}`)}>
-            Copy id
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-];
+import { makeTasks, type Task, taskColumns } from './tasks';
 
 /** Sorting, search, pagination and column visibility with the default toolbar. */
 export const Default: Story = () => {
   const data = useMemo(() => makeTasks(64), []);
   return (
     <>
-      <DataTable columns={columns} data={data} getRowId={(task) => task.id} />
+      <DataTable columns={taskColumns} data={data} getRowId={(task) => task.id} />
       <Toaster />
     </>
   );
@@ -127,11 +27,11 @@ export const Default: Story = () => {
 /** Row selection with a checkbox column; canceled tasks cannot be selected. */
 export const RowSelection: Story = () => {
   const data = useMemo(() => makeTasks(30), []);
-  const [selection, setSelection] = useState<Record<string, boolean>>({});
+  const [selection, setSelection] = useState<RowSelectionState>({});
   return (
     <div className="grid gap-4">
       <DataTable
-        columns={columns}
+        columns={taskColumns}
         data={data}
         getRowId={(task) => task.id}
         enableRowSelection={(row) => row.original.status !== 'canceled'}
@@ -142,40 +42,6 @@ export const RowSelection: Story = () => {
         {JSON.stringify(Object.keys(selection))}
       </pre>
     </div>
-  );
-};
-
-/** A custom toolbar with a status filter and a starting sort. */
-export const CustomToolbar: Story = () => {
-  const data = useMemo(() => makeTasks(48), []);
-  return (
-    <DataTable
-      columns={columns}
-      data={data}
-      initialState={{ sorting: [{ id: 'estimate', desc: true }] }}
-      toolbar={(table) => {
-        const status = table.getColumn('status');
-        const value = (status?.getFilterValue() as string | undefined) ?? '';
-        return (
-          <DataTableToolbar table={table}>
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              size="sm"
-              aria-label="Status"
-              value={value}
-              onValueChange={(next) => status?.setFilterValue(next || undefined)}
-            >
-              {STATUSES.map((s) => (
-                <ToggleGroupItem key={s} value={s}>
-                  {s}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </DataTableToolbar>
-        );
-      }}
-    />
   );
 };
 
@@ -193,7 +59,7 @@ export const ServerSide: Story = () => {
   }, [all, pagination]);
   return (
     <DataTable
-      columns={columns}
+      columns={taskColumns}
       data={page}
       getRowId={(task) => task.id}
       manualPagination
@@ -208,7 +74,7 @@ export const ServerSide: Story = () => {
 /** No toolbar, no pagination, and a custom empty state. */
 export const Empty: Story = () => (
   <DataTable
-    columns={columns}
+    columns={taskColumns}
     data={[]}
     toolbar={false}
     paginate={false}
@@ -228,7 +94,7 @@ export const TranslatedLabels: Story = () => {
   const data = useMemo(() => makeTasks(40), []);
   return (
     <DataTable
-      columns={columns}
+      columns={taskColumns}
       data={data}
       enableRowSelection
       labels={{
@@ -292,7 +158,7 @@ export const Virtualized: Story = () => {
   const data = useMemo(() => makeTasks(10_000), []);
   return (
     <DataTable
-      columns={columns}
+      columns={taskColumns}
       data={data}
       getRowId={(task) => task.id}
       paginate={false}

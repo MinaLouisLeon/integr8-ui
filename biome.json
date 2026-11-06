@@ -17,6 +17,17 @@
   },
   "overrides": [
     {
+      "includes": [".size-limit.mjs"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off",
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["playground/config.mjs"],
       "linter": {
         "rules": {

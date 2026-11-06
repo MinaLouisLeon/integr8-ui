@@ -1,3 +1,4 @@
+import type { RowSelectionState } from '@tanstack/react-table';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { useState } from 'react';
@@ -5,8 +6,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { DataTable, type DataTableVirtualRowsHook } from './DataTable';
 import { firstColumnTexts, makePeople, type Person, personColumns } from './dataTableTestUtils';
 
-function ControlledSelection({ seen }: { seen: Record<string, boolean>[] }) {
-  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+function ControlledSelection({ seen }: { seen: RowSelectionState[] }) {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   seen.push(rowSelection);
   return (
     <DataTable<Person>
@@ -274,7 +275,7 @@ describe('DataTable', () => {
 
     it('reports selection by row id when controlled', async () => {
       const user = userEvent.setup();
-      const seen: Record<string, boolean>[] = [];
+      const seen: RowSelectionState[] = [];
       render(<ControlledSelection seen={seen} />);
 
       await user.click(screen.getAllByRole('checkbox', { name: 'Select row' })[1] as HTMLElement);

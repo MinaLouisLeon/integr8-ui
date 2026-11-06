@@ -374,6 +374,11 @@ export {
   type DataTableColumnHeaderProps,
 } from './components/data-table/DataTableColumnHeader';
 export {
+  DataTableFacetedFilter,
+  type DataTableFacetedFilterOption,
+  type DataTableFacetedFilterProps,
+} from './components/data-table/DataTableFacetedFilter';
+export {
   DataTablePagination,
   type DataTablePaginationProps,
 } from './components/data-table/DataTablePagination';
@@ -386,10 +391,32 @@ export {
   type DataTableViewOptionsProps,
 } from './components/data-table/DataTableViewOptions';
 export type {
+  DataTableColumn,
   DataTableColumnDef,
+  DataTableFeatures,
   DataTableInstance,
-  DataTableLabels,
-} from './components/data-table/dataTableLabels';
+  DataTableRow,
+  DataTableState,
+} from './components/data-table/dataTableFeatures';
+export type { DataTableLabels } from './components/data-table/dataTableLabels';
+export {
+  Table,
+  TableBody,
+  type TableBodyProps,
+  TableCaption,
+  type TableCaptionProps,
+  TableCell,
+  type TableCellProps,
+  TableFooter,
+  type TableFooterProps,
+  TableHead,
+  TableHeader,
+  type TableHeaderProps,
+  type TableHeadProps,
+  type TableProps,
+  TableRow,
+  type TableRowProps,
+} from './components/data-table/Table';
 // ---------- Feedback ----------
 export {
   EmptyState,
@@ -449,9 +476,13 @@ export {
   type SidebarGroupProps,
   SidebarHeader,
   type SidebarHeaderProps,
+  SidebarInput,
+  type SidebarInputProps,
   SidebarInset,
   type SidebarInsetProps,
   SidebarMenu,
+  SidebarMenuAction,
+  type SidebarMenuActionProps,
   SidebarMenuBadge,
   type SidebarMenuBadgeProps,
   SidebarMenuButton,
@@ -460,15 +491,25 @@ export {
   SidebarMenuItem,
   type SidebarMenuItemProps,
   type SidebarMenuProps,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  type SidebarMenuSubButtonProps,
+  type SidebarMenuSubButtonSize,
+  SidebarMenuSubItem,
+  type SidebarMenuSubItemProps,
+  type SidebarMenuSubProps,
   type SidebarProps,
   SidebarProvider,
   type SidebarProviderProps,
+  SidebarRail,
+  type SidebarRailProps,
   SidebarSeparator,
   type SidebarSeparatorProps,
   type SidebarSide,
   type SidebarState,
   SidebarTrigger,
   type SidebarTriggerProps,
+  type SidebarVariant,
   useSidebar,
 } from './components/layout/Sidebar';
 export {
@@ -505,6 +546,9 @@ export {
 } from './components/layout/Toolbar';
 
 // ---------- Theme and utilities ----------
+export { GradientText, type GradientTextProps } from './components/theme/GradientText';
+export { GrainOverlay, type GrainOverlayProps } from './components/theme/GrainOverlay';
+export { ThemeSwitcher, type ThemeSwitcherProps } from './components/theme/ThemeSwitcher';
 export { cn } from './lib/cn';
 export { type DefineThemeOptions, defineTheme } from './theme/defineTheme';
 export { ThemeProvider, type ThemeProviderProps } from './theme/ThemeProvider';
@@ -513,4 +557,4 @@ export { ThemeError, type ThemeErrorCode } from './theme/themeError';
 export { getThemeScript, type ThemeScriptOptions } from './theme/themeScript';
 export type { ThemeStorage } from './theme/themeStorage';
 export type { ThemeBase, ThemeDefinition, ThemeTokens, TokenName } from './theme/tokens';
-export { useTheme } from './theme/useTheme';
+export { useOptionalTheme, useTheme } from './theme/useTheme';

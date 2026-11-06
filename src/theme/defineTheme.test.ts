@@ -100,9 +100,12 @@ describe('defineTheme', () => {
     },
   );
 
-  it.each(['light', 'dark', 'system', 'integr8'])('rejects the reserved name %s', (name) => {
-    expectInvalid(() => defineTheme({ name, label: 'X', base: 'light', tokens: {} }));
-  });
+  it.each(['light', 'dark', 'system', 'integr8', 'integr8-light'])(
+    'rejects the reserved name %s',
+    (name) => {
+      expectInvalid(() => defineTheme({ name, label: 'X', base: 'light', tokens: {} }));
+    },
+  );
 
   it('rejects an empty label', () => {
     expectInvalid(() => defineTheme({ name: 'brand', label: '  ', base: 'light', tokens: {} }));

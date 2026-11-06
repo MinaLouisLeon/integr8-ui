@@ -1,14 +1,25 @@
 import type { Story } from '@ladle/react';
 import {
+  BookIcon,
   FilesIcon,
+  FolderIcon,
   GitBranchIcon,
   HouseIcon,
   InboxIcon,
+  MoreHorizontalIcon,
+  PlusIcon,
   SearchIcon,
   SettingsIcon,
 } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Sidebar,
   type SidebarCollapsible,
   SidebarContent,
@@ -17,15 +28,22 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
+  SidebarInput,
   SidebarInset,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarProvider,
+  SidebarRail,
   SidebarSeparator,
   type SidebarSide,
   SidebarTrigger,
+  type SidebarVariant,
   useSidebar,
 } from '../../src';
 
@@ -40,13 +58,15 @@ const ITEMS = [
 function DemoSidebar({
   collapsible,
   side,
+  variant,
 }: {
   collapsible?: SidebarCollapsible;
   side?: SidebarSide;
+  variant?: SidebarVariant;
 }): ReactNode {
   const [active, setActive] = useState('Home');
   return (
-    <Sidebar collapsible={collapsible} side={side}>
+    <Sidebar collapsible={collapsible} side={side} variant={variant}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -173,3 +193,109 @@ export const Controlled: Story = () => {
     </div>
   );
 };
+
+/** `variant="floating"`: a rounded card with a gap around it. */
+export const Floating: Story = () => (
+  <SidebarProvider className={BOX}>
+    <DemoSidebar variant="floating" />
+    <Frame>Floating</Frame>
+  </SidebarProvider>
+);
+
+/** `variant="inset"`: the page content sits in a rounded card next to the sidebar. */
+export const Inset: Story = () => (
+  <SidebarProvider className={BOX}>
+    <DemoSidebar variant="inset" />
+    <Frame>Inset</Frame>
+  </SidebarProvider>
+);
+
+const DOCS = [
+  { label: 'Getting started', pages: ['Install', 'Themes', 'Fonts'] },
+  { label: 'Components', pages: ['Button', 'Data table', 'Sidebar'] },
+];
+
+/**
+ * Search box (`SidebarInput`), collapsible sub menus (`SidebarMenuSub*`), "…" and "+" actions
+ * (`SidebarMenuAction`, the "…" only on hover) and a click-to-toggle rail (`SidebarRail`).
+ */
+export const NestedMenusAndActions: Story = () => {
+  const [page, setPage] = useState('Themes');
+  return (
+    <SidebarProvider className={BOX}>
+      <Sidebar>
+        <SidebarHeader>
+          <SidebarInput type="search" placeholder="Search docs…" aria-label="Search docs" />
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Docs</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {DOCS.map((section) => (
+                  <Collapsible key={section.label} asChild defaultOpen>
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={section.label}>
+                          <BookIcon />
+                          <span>{section.label}</span>
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <SidebarMenuAction showOnHover aria-label={`More for ${section.label}`}>
+                            <MoreHorizontalIcon />
+                          </SidebarMenuAction>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="right" align="start">
+                          <DropdownMenuItem>Rename</DropdownMenuItem>
+                          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {section.pages.map((item) => (
+                            <SidebarMenuSubItem key={item}>
+                              <SidebarMenuSubButton
+                                isActive={page === item}
+                                onClick={() => setPage(item)}
+                              >
+                                <span>{item}</span>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Projects">
+                    <FolderIcon />
+                    <span>Projects</span>
+                  </SidebarMenuButton>
+                  <SidebarMenuAction aria-label="Add project">
+                    <PlusIcon />
+                  </SidebarMenuAction>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+      <Frame>Click the rail on the sidebar edge to collapse</Frame>
+    </SidebarProvider>
+  );
+};
+
+/**
+ * `persist="cookie"`: the expanded state is saved in the `sidebar_state` cookie, so it
+ * survives a reload of this story.
+ */
+export const CookiePersist: Story = () => (
+  <SidebarProvider className={BOX} persist="cookie">
+    <DemoSidebar />
+    <Frame>Collapse, then reload the page</Frame>
+  </SidebarProvider>
+);

@@ -15,9 +15,10 @@ export interface ThemeScriptOptions {
  * server-rendered apps do not flash the wrong theme. Put it in `<head>` and add
  * `suppressHydrationWarning` to `<html>`, because the script changes its attributes.
  *
- * The script knows the built-in themes (`light`, `dark`, `system`, `integr8`). A saved custom
- * theme falls back to `defaultTheme` until `ThemeProvider` mounts and applies it. It only
- * reads localStorage, so apps with a custom `storage` adapter get `defaultTheme` here.
+ * The script knows the built-in themes (`light`, `dark`, `system`, `integr8`,
+ * `integr8-light`). A saved custom theme falls back to `defaultTheme` until `ThemeProvider`
+ * mounts and applies it. It only reads localStorage, so apps with a custom `storage` adapter
+ * get `defaultTheme` here.
  *
  * Safe to call on the server: it has no `'use client'` dependency.
  *

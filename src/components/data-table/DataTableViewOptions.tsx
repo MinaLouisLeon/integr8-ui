@@ -1,6 +1,6 @@
 'use client';
 
-import type { Column, Table } from '@tanstack/react-table';
+import type { RowData } from '@tanstack/react-table';
 import { Settings2Icon } from 'lucide-react';
 import type { JSX } from 'react';
 import { cn } from '../../lib/cn';
@@ -13,12 +13,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../basics/DropdownMenu';
+import type { DataTableColumn, DataTableInstance } from './dataTableFeatures';
 import { useDataTableLabels } from './dataTableLabels';
 
 /** Props for {@link DataTableViewOptions}. */
-export type DataTableViewOptionsProps<TData> = {
+export type DataTableViewOptionsProps<TData extends RowData> = {
   /** The table instance. */
-  table: Table<TData>;
+  table: DataTableInstance<TData>;
   /** Classes for the trigger button. */
   className?: string | undefined;
 };
@@ -28,7 +29,7 @@ export type DataTableViewOptionsProps<TData> = {
  *
  * @internal
  */
-export function columnLabel<TData>(column: Column<TData, unknown>): string {
+export function columnLabel<TData extends RowData>(column: DataTableColumn<TData>): string {
   const { header } = column.columnDef;
   return typeof header === 'string' ? header : column.id;
 }
@@ -42,7 +43,7 @@ export function columnLabel<TData>(column: Column<TData, unknown>): string {
  * <DataTable columns={columns} data={data} toolbar={(table) => <DataTableViewOptions table={table} />} />
  * ```
  */
-export function DataTableViewOptions<TData>({
+export function DataTableViewOptions<TData extends RowData>({
   table,
   className,
 }: DataTableViewOptionsProps<TData>): JSX.Element {
