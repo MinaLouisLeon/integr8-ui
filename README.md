@@ -8,9 +8,6 @@ a data table, a command palette and app layout pieces.
 every item, live previews in every theme, and a documentation page for each item (preview,
 installation, usage, API reference and source).
 
-The full spec is in [docs/SPEC.md](docs/SPEC.md). The API reference is generated from TSDoc with
-`npm run docs` (output in `docs/api/`).
-
 ## Requirements
 
 - React 19
