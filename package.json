@@ -1,6 +1,6 @@
 {
   "name": "@integr8-media/ui",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Design system for every @integr8-media app: shadcn/ui components on Radix + Tailwind v4, a theme engine with Light, Dark, System and Integr8 themes, a form kit, a data table, a command palette and app layout pieces.",
   "author": "Mina Louis Leon",
   "repository": {
@@ -90,7 +90,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@biomejs/biome": "^2.6.5",
-    "@integr8-media/config": "^1.0.0",
+    "@integr8-media/config": "^1.1.0",
     "@ladle/react": "^5.0.3",
     "@playwright/test": "^1.56.1",
     "@size-limit/esbuild": "^11.2.0",
