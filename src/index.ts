@@ -419,6 +419,15 @@ export {
 } from './components/data-table/Table';
 // ---------- Date and time ----------
 export { Calendar, type CalendarProps, type DateRange } from './components/date/Calendar';
+export { TimeField, type TimeFieldProps } from './components/date/TimeField';
+export { TimeInput, type TimeInputProps } from './components/date/TimeInput';
+export {
+  type Time,
+  TimeError,
+  type TimeErrorCode,
+  toTime,
+  withTime,
+} from './components/date/time';
 // ---------- Feedback ----------
 export {
   EmptyState,
