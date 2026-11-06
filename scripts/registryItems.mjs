@@ -13,6 +13,7 @@
  * @property {string} alias Import path of the folder in a shadcn project, for example `@/lib/theme/`.
  * @property {boolean} [themeCss] Add the tokens and styles from `src/styles/theme.css`.
  * @property {string[]} [registryDependencies] Names of other items it needs, for example `fonts`.
+ * @property {string[]} [categories] Registry categories, for example `['theme']`.
  * @property {string} [docs] Message shown after `shadcn add` (default: the config's `docs`).
  */
 
@@ -23,7 +24,7 @@
  * @property {RegExp[]} exclude Paths to skip.
  * @property {Record<string, RegistryBundle>} bundles Source folder prefix → one multi-file item.
  * @property {Record<string, { name: string; file: string }>} renames Item name and target file overrides.
- * @property {{ name: string; title: string; description: string }} fonts The fonts item.
+ * @property {{ name: string; title: string; description: string; categories?: string[] }} fonts The fonts item.
  * @property {string[]} peerPackages Packages never listed as dependencies.
  * @property {string} docs Message shown after `shadcn add`; `{baseUrl}` is filled in.
  */
@@ -125,6 +126,14 @@ export function resolveRelative(fromPath, specifier) {
 export function packageName(specifier) {
   const parts = specifier.split('/');
   return specifier.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0];
+}
+
+/**
+ * The group of a source file, used as the item's registry category:
+ * `src/components/<group>/...` → `<group>`, anything else → `lib`.
+ */
+export function categoryOf(path) {
+  return path.match(/^src\/components\/([^/]+)\//)?.[1] ?? 'lib';
 }
 
 /** The base URL with `{name}` and `{version}` filled in and no trailing slash. */
@@ -415,6 +424,7 @@ export function buildRegistryItems(files, pkg, config, styles = {}) {
       type: entry.type,
       title,
       ...(description ? { description } : {}),
+      categories: [categoryOf(file.path)],
       ...(dependencies.size > 0 ? { dependencies: [...dependencies].sort() } : {}),
       ...(registryDependencies.size > 0
         ? { registryDependencies: [...registryDependencies].sort() }
@@ -453,6 +463,7 @@ export function buildRegistryItems(files, pkg, config, styles = {}) {
       type: 'registry:item',
       title: bundle.title,
       description: bundle.description,
+      ...(bundle.categories ? { categories: bundle.categories } : {}),
       ...(dependencies.size > 0 ? { dependencies: [...dependencies].sort() } : {}),
       ...(registryDependencies.size > 0
         ? { registryDependencies: [...registryDependencies].sort() }
@@ -490,6 +501,7 @@ export function buildFontsItem(fontsCss, pkg, config) {
     type: 'registry:item',
     title: config.fonts.title,
     description: config.fonts.description,
+    ...(config.fonts.categories ? { categories: config.fonts.categories } : {}),
     ...(dependencies.length > 0 ? { dependencies: dependencies.sort() } : {}),
     css: Object.fromEntries(imports.map((specifier) => [`@import "${specifier}"`, {}])),
   };
@@ -511,74 +523,4 @@ export function buildRegistryIndex(items, pkg) {
       ...(files ? { files: files.map(({ content: _content, ...rest }) => rest) } : {}),
     })),
   };
-}
-
-/** Escapes text for HTML. */
-function escapeHtml(text) {
-  return String(text)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
-}
-
-/**
- * The landing page of the hosted registry (GitHub Pages now, the website later): how to set up
- * a project and the `shadcn add` command for every item.
- *
- * @param {ReturnType<typeof buildRegistryIndex>} index
- * @param {string} baseUrl Where the item JSON files are served.
- * @param {string} version The package version the registry was built from.
- */
-export function renderRegistryPage(index, baseUrl, version) {
-  const url = (name) => escapeHtml(`${baseUrl}/${name}.json`);
-  const rows = index.items
-    .map(
-      (item) =>
-        `      <tr><td><code>${escapeHtml(item.name)}</code></td><td>${escapeHtml(item.description ?? '')}</td><td><code>npx shadcn@latest add ${url(item.name)}</code></td></tr>`,
-    )
-    .join('\n');
-  const registries = escapeHtml(
-    JSON.stringify({ registries: { '@integr8': `${baseUrl}/{name}.json` } }, null, 2),
-  );
-  return `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(index.name)} registry</title>
-  <style>
-    :root { color-scheme: light dark; --bg: #f7f6fc; --fg: #0d0b16; --muted: #5d5873; --line: rgba(13, 11, 22, 0.12); --code: #efedf7; }
-    @media (prefers-color-scheme: dark) { :root { --bg: #07060b; --fg: #f4f2ff; --muted: #9a96b0; --line: rgba(255, 255, 255, 0.1); --code: #100e18; } }
-    body { margin: 0 auto; max-width: 72rem; padding: 2rem 1rem; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
-    p, li { color: var(--muted); }
-    code, pre { background: var(--code); border-radius: 0.375rem; font: 0.875em ui-monospace, Menlo, monospace; }
-    code { padding: 0.1em 0.3em; overflow-wrap: anywhere; }
-    pre { padding: 1rem; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; vertical-align: top; padding: 0.5rem; border-bottom: 1px solid var(--line); }
-    @media (max-width: 40rem) { td:nth-child(2), th:nth-child(2) { display: none; } }
-  </style>
-</head>
-<body>
-  <h1>${escapeHtml(index.name)} registry</h1>
-  <p>shadcn registry for the Integr8 design system, built from version ${escapeHtml(version)}. Copy only the components you need into your project. No npm package to install.</p>
-  <h2>Set up a project</h2>
-  <ol>
-    <li>Start from a shadcn project with Tailwind v4: <code>npx shadcn@latest init</code>.</li>
-    <li>Add the theme once (tokens, the five themes, ThemeProvider and the fonts): <code>npx shadcn@latest add ${url('theme')}</code></li>
-    <li>Add components: <code>npx shadcn@latest add ${url('button')}</code></li>
-  </ol>
-  <p>Shorter names: add this to <code>components.json</code>, then run <code>npx shadcn@latest add @integr8/button</code>.</p>
-  <pre>${registries}</pre>
-  <h2>Items</h2>
-  <table>
-    <thead><tr><th>Name</th><th>What it is</th><th>Install</th></tr></thead>
-    <tbody>
-${rows}
-    </tbody>
-  </table>
-</body>
-</html>
-`;
 }

@@ -29,6 +29,12 @@ function LadleThemeGuard(): null {
 
 /** Query parameter that picks the theme, used by the smoke test: `?integr8Theme=dark`. */
 const THEME_PARAM = 'integr8Theme';
+/**
+ * Query parameter set by the registry site's live preview (`?integr8Embed=1`): the site has its
+ * own theme buttons, so the story renders without the toolbar.
+ */
+const EMBED_PARAM = 'integr8Embed';
+const isEmbedded = new URLSearchParams(window.location.search).get(EMBED_PARAM) === '1';
 const STORAGE_KEY = 'integr8-ui-playground-theme';
 
 // The URL wins over the saved choice, so every story can be opened in a given theme.
@@ -103,7 +109,7 @@ export const Provider: GlobalProvider = ({ children }) => (
         fontFamily: 'var(--font-sans)',
       }}
     >
-      <ThemeToolbar />
+      {isEmbedded ? null : <ThemeToolbar />}
       <div style={{ padding: 24 }}>{children}</div>
     </div>
   </ThemeProvider>
