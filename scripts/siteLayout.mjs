@@ -10,6 +10,7 @@ export const CATEGORIES = [
   ['form', 'Form kit'],
   ['data-table', 'Data table'],
   ['layout', 'App layout'],
+  ['date', 'Date and time'],
   ['theme', 'Theme'],
   ['lib', 'Utilities'],
 ];

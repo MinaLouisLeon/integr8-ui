@@ -2,7 +2,9 @@
 
 This repo is `@integr8-media/ui`: the design system for every @integr8-media app (shadcn/ui on Radix + Tailwind v4, four themes including the Integr8 brand theme, form kit, data table, command palette, app layout pieces). It is build step 2 of the Integr8 Workbench project. Tooling comes from `@integr8-media/config` (already published).
 
-**The source of truth for what to build is `docs/SPEC.md`.** Read it fully before writing code. If something is unclear or the spec seems wrong, stop and ask; do not guess or change the public API.
+**The source of truth for what to build is `docs/SPEC.md`.** If something is unclear or the spec seems wrong, stop and ask; do not guess or change the public API.
+
+**Do not read spec files unless the developer explicitly tells you to in that session.** This covers `docs/SPEC.md` and every feature spec split out of it (for example `docs/spec-calendar.md`, linked from SPEC.md's "Date and time" section). A link from one spec to another, or a task that touches a spec's area, is not permission to open it; ask the developer instead. When told to read a spec, read it fully.
 
 ## Rules for Claude Code
 
