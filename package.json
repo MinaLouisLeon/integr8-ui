@@ -44,6 +44,7 @@
     "build": "tsdown && node scripts/buildAssets.mjs && npm run build:css && npm run build:registry",
     "build:css": "tailwindcss --input src/styles/styles.entry.css --output dist/styles.css --minify",
     "build:registry": "node scripts/buildRegistry.mjs",
+    "build:registry-site": "node scripts/buildRegistry.mjs && node scripts/buildRegistrySite.mjs",
     "size": "size-limit",
     "fixtures": "node scripts/fixtures.mjs",
     "playground": "ladle serve --config playground",

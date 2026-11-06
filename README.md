@@ -313,21 +313,44 @@ Sidebar, PageHeader, SplitPanes (react-resizable-panels v4), StatusBar and Toolb
 
 ## shadcn registry
 
-Every component is also published as a shadcn registry item inside the npm package, for when an
-app needs its own copy to customize heavily:
+Like shadcn/ui, an app can copy in only the components it needs, with no npm package to
+install. The registry is hosted at <https://minalouisleon.github.io/integr8-ui/>.
 
 ```sh
-npx shadcn add https://cdn.jsdelivr.net/npm/@integr8-media/ui@<version>/dist/registry/button.json
+npx shadcn@latest init                                                          # a shadcn project with Tailwind v4
+npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/theme.json   # once: tokens, themes, ThemeProvider, fonts
+npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/button.json
 ```
 
-- Items are generated at build time from the same source files (`npm run build:registry`,
-  config in `registry/registry.config.mjs`). `dist/registry/registry.json` lists them all.
+Shorter names: add the registry to `components.json`, then `npx shadcn@latest add @integr8/button`.
+
+```json
+{
+  "registries": {
+    "@integr8": "https://minalouisleon.github.io/integr8-ui/r/{name}.json"
+  }
+}
+```
+
+Then wrap the app in the copied provider:
+
+```tsx
+import { ThemeProvider } from '@/lib/theme/ThemeProvider';
+import { ThemeSwitcher } from '@/components/ui/theme-switcher';
+```
+
+- `theme` copies the theme engine to `@/lib/theme/` and writes the tokens of all five themes into
+  your CSS (Light and Dark into your `:root` and `.dark` blocks). It also adds `fonts`
+  (Inter, JetBrains Mono, Unbounded from Fontsource, no Google Fonts requests).
 - Item names are the kebab-case file names: `data-table`, `sidebar`, `theme-switcher`, ...
-- Copied components import `cn` from `@/lib/utils` and each other from `@/components/ui/*`;
-  `shadcn add` installs the components an item needs.
-- They still need the theme tokens: install `@integr8-media/ui` and add
-  `@import "@integr8-media/ui/theme.css";`. Theme engine imports (`useTheme`, ...) stay imports
-  of the package, so copies share the app's `ThemeProvider`.
+- Copied components import `cn` from `@/lib/utils`, each other from `@/components/ui/*` and the
+  theme from `@/lib/theme/*`; `shadcn add` installs what an item needs.
+- Items are generated from the same source files (`npm run build:registry`, config in
+  `registry/registry.config.mjs`). `npm run build:registry-site` also builds the landing page into
+  `site/`. `.github/workflows/registry.yml` deploys `site/` to GitHub Pages on every push to
+  `main`. To move the registry (for example to the website), set the `REGISTRY_BASE_URL`
+  repository variable to the new URL of the `r/` folder.
+- The items are also in the npm package under `@integr8-media/ui/registry/*`.
 
 ## Non-goals
 
