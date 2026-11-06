@@ -5,6 +5,7 @@ import {
   buildFontsItem,
   buildRegistryIndex,
   buildRegistryItems,
+  categoryOf,
   describeExport,
   describeFile,
   importSpecifiers,
@@ -12,7 +13,6 @@ import {
   packageName,
   parseCss,
   RegistryError,
-  renderRegistryPage,
   resolveBaseUrl,
   resolveRelative,
   themeCssToRegistry,
@@ -171,6 +171,12 @@ describe('naming', () => {
     expect(aliasFor('ui/button.tsx')).toBe('@/components/ui/button');
     expect(aliasFor('lib/utils.ts')).toBe('@/lib/utils');
     expect(aliasFor('hooks/use-zod-form.ts')).toBe('@/hooks/use-zod-form');
+  });
+
+  it('takes the category from the component folder', () => {
+    expect(categoryOf('src/components/data-table/DataTable.tsx')).toBe('data-table');
+    expect(categoryOf('src/components/basics/Button.tsx')).toBe('basics');
+    expect(categoryOf('src/lib/cn.ts')).toBe('lib');
   });
 
   it('fills in the base URL and drops the trailing slash', () => {
@@ -355,6 +361,14 @@ describe('buildRegistryItems', () => {
     expect(Object.keys(theme.css)).toContain('@layer components');
   });
 
+  it('gives every item a category', () => {
+    expect(byName.button.categories).toEqual(['basics']);
+    expect(byName['theme-switcher'].categories).toEqual(['theme']);
+    expect(byName.utils.categories).toEqual(['lib']);
+    expect(byName.theme.categories).toEqual(['theme']);
+    expect(byName.fonts.categories).toEqual(['theme']);
+  });
+
   it('never lists react as a dependency', () => {
     expect(items.flatMap((item) => item.dependencies ?? [])).not.toContainEqual(
       expect.stringMatching(/^react(@|$)/),
@@ -403,31 +417,5 @@ describe('buildRegistryItems', () => {
     expect(theme.css).toBeUndefined();
     expect(theme.files[0].target).toBe('@lib/theme/themeContext.ts');
     expect(index.items.find((item) => item.name === 'fonts').files).toBeUndefined();
-  });
-});
-
-describe('renderRegistryPage', () => {
-  const index = buildRegistryIndex(
-    buildRegistryItems([buttonFile, cnFile, ...themeFiles], pkg, config, { themeCss, fontsCss }),
-    pkg,
-  );
-  const html = renderRegistryPage(index, BASE, '1.2.3');
-
-  it('shows the setup steps and an install command per item', () => {
-    expect(html.startsWith('<!doctype html>')).toBe(true);
-    expect(html).toContain(`npx shadcn@latest add ${BASE}/theme.json`);
-    expect(html).toContain(`npx shadcn@latest add ${BASE}/button.json`);
-    expect(html).toContain('version 1.2.3');
-    expect(html).toContain(`&quot;@integr8&quot;: &quot;${BASE}/{name}.json&quot;`);
-  });
-
-  it('escapes item text', () => {
-    const page = renderRegistryPage(
-      { name: 'x', items: [{ name: 'a', description: '<b>bold</b> & "q"' }] },
-      BASE,
-      '1.0.0',
-    );
-    expect(page).toContain('&lt;b&gt;bold&lt;/b&gt; &amp; &quot;q&quot;');
-    expect(page).not.toContain('<b>bold</b>');
   });
 });

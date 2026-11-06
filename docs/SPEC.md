@@ -42,7 +42,8 @@ With `"registries": { "@integr8": "https://minalouisleon.github.io/integr8-ui/r/
 - `theme` (`registry:item`): the whole theme engine (`src/theme/`) copied to `@/lib/theme/` with its file names and folders (so `ThemeProvider` is `@/lib/theme/ThemeProvider`), plus the tokens and styles of `theme.css`: Light → `cssVars.light` (`:root`), Dark → `cssVars.dark` (`.dark`), `@theme inline` → `cssVars.theme`, and Integr8, Integr8 Light, the `integr8` variant, the Integr8 extras and the reduced-motion rule → `css`. Integr8 selectors also match `:root[data-theme]` and `[data-theme].dark`, so they win over the project's own `:root` / `.dark` blocks. Components that use the theme (`ThemeSwitcher`, `Toaster`) import `@/lib/theme/*` and list `theme` as a registry dependency.
 - `fonts` (`registry:item`): the Fontsource `@import`s of `fonts.css` as CSS and the font packages as dependencies; `theme` depends on it.
 - Every component item's `docs` says to add `theme` once.
-- Hosting: `.github/workflows/registry.yml` builds the registry and a landing page (`scripts/buildRegistrySite.mjs` → `site/`) on every push to `main` and deploys it to GitHub Pages. Needs a shadcn CLI recent enough for `@lib/` target placeholders (`shadcn@latest`).
+- Every item has `categories` (its `src/components/<group>` folder, `lib` for helpers, `theme` for `theme` and `fonts`); the site groups items by it.
+- Hosting: `.github/workflows/registry.yml` builds the site (`scripts/buildRegistrySite.mjs` → `site/`) on every push to `main` and deploys it to GitHub Pages: a landing page styled like integr8-media.com (`scripts/registryPage.mjs`: setup steps, searchable item list grouped by category, copy buttons), one documentation page per item at `components/<name>/` (`scripts/itemPage.mjs`: live preview of its stories, installation, usage, API reference read from the TSDoc comments by `scripts/sourceDocs.mjs` with the TypeScript parser (`@internal` exports left out), styles for `theme`/`fonts`, source, used by, previous/next), the JSON in `r/`, the self-hosted fonts in `assets/`, and the Ladle playground in `playground/`. The page embeds playground stories as live previews (`?integr8Embed=1` hides the playground's theme toolbar). `REGISTRY_BASE_URL` and `SITE_BASE_PATH` move it to another host. Needs a shadcn CLI recent enough for `@lib/` target placeholders (`shadcn@latest`).
 
 ## Themes
 
@@ -480,7 +481,7 @@ src/
   components/<group>/      Button.tsx, DataTable.tsx, ... (theme/: ThemeSwitcher, GradientText, GrainOverlay)
   styles/                  theme.css, styles.entry.css, fonts.css
 registry/                  registry.config.mjs: generator config for the shadcn registry
-scripts/                   buildAssets.mjs, buildRegistry.mjs + buildRegistrySite.mjs + registryItems.mjs (tested), fixtures.mjs
+scripts/                   buildAssets.mjs, buildRegistry.mjs + buildRegistrySite.mjs + registryItems.mjs + siteLayout.mjs + registryPage.mjs + itemPage.mjs + sourceDocs.mjs (tested), serveSite.mjs, fixtures.mjs
 fixtures/                  tailwind-app/, plain-app/, fixtures.spec.ts, playwright.config.ts
 playground/                Ladle config + stories (one per component, all themes)
 docs/SPEC.md

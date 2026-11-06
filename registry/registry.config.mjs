@@ -23,6 +23,7 @@ export default {
       alias: '@/lib/theme/',
       themeCss: true,
       registryDependencies: ['fonts'],
+      categories: ['theme'],
       docs: 'Wrap your app in <ThemeProvider> from "@/lib/theme/ThemeProvider". For SSR apps, put getThemeScript() from "@/lib/theme/themeScript" in <head> to avoid a theme flash.',
     },
   },
@@ -32,6 +33,7 @@ export default {
   fonts: {
     name: 'fonts',
     title: 'Fonts',
+    categories: ['theme'],
     description:
       'Inter, JetBrains Mono and Unbounded from Fontsource, served by your app (no Google Fonts requests).',
   },
