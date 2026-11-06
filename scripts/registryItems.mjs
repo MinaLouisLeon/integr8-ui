@@ -195,7 +195,8 @@ export function describeExport(content, name) {
 export function buildRegistryItems(files, pkg, config) {
   const baseUrl = config.baseUrl.replace('{name}', pkg.name).replace('{version}', pkg.version);
   const byPath = new Map(
-    files.map((file) => [file.path, { file, ...describeFile(file.path, config) }]),
+    // `source` is the repo file; `file` (from describeFile) is its path in a shadcn project.
+    files.map((file) => [file.path, { source: file, ...describeFile(file.path, config) }]),
   );
   const exported = publicExports(pkg.indexContent);
 
@@ -205,10 +206,10 @@ export function buildRegistryItems(files, pkg, config) {
     if (other) {
       throw new RegistryError(
         'DUPLICATE_NAME',
-        `Registry: ${entry.file.path} and ${other} would both be "${entry.name}".`,
+        `Registry: ${entry.source.path} and ${other} would both be "${entry.name}".`,
       );
     }
-    seen.set(entry.name, entry.file.path);
+    seen.set(entry.name, entry.source.path);
   }
 
   /** Finds the source file a relative import points to (with or without extension). */
@@ -221,7 +222,7 @@ export function buildRegistryItems(files, pkg, config) {
   return [...byPath.values()]
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((entry) => {
-      const { file } = entry;
+      const file = entry.source;
       const dependencies = new Set();
       const registryDependencies = new Set();
       let content = file.content;

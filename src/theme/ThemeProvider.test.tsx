@@ -299,6 +299,7 @@ describe('ThemeProvider', () => {
         'light',
         'dark',
         'integr8',
+        'integr8-light',
         'ocean',
         'paper',
       ]);
