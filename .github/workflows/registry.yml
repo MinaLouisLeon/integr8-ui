@@ -1,0 +1,47 @@
+# Publishes the shadcn registry to GitHub Pages on every push to main (a release).
+# Setup once: repo Settings → Pages → Source: "GitHub Actions".
+# To move the registry (for example to the website), set the repository variable
+# REGISTRY_BASE_URL (Settings → Secrets and variables → Actions → Variables) to the new URL
+# of the folder that holds the JSON files, such as https://integr8-media.com/ui/r.
+# The generator only uses Node built-ins, so no npm install is needed.
+name: Registry
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY_BASE_URL: ${{ vars.REGISTRY_BASE_URL || format('https://{0}.github.io/{1}/r', github.repository_owner, github.event.repository.name) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/buildRegistry.mjs && node scripts/buildRegistrySite.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

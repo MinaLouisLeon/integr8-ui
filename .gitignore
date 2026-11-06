@@ -8,3 +8,4 @@ playwright-report/
 *.tgz
 *.log
 fixtures/*/package-lock.json
+site/

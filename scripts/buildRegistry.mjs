@@ -1,10 +1,14 @@
 // Builds the shadcn registry into dist/registry/: one <name>.json per component, hook and lib
-// file, plus registry.json (the index). Config: registry/registry.config.mjs.
+// file, theme.json (the theme engine, tokens and styles), fonts.json, plus registry.json (the
+// index). Config: registry/registry.config.mjs.
 //
 // Usage: node scripts/buildRegistry.mjs   (runs as the last step of `npm run build`)
+//   REGISTRY_BASE_URL=https://example.com/r node scripts/buildRegistry.mjs   (another host)
+//
+// It only uses Node built-ins, so it runs without `npm install` (the Pages workflow relies on it).
 //
 // Install an item into a shadcn project:
-//   npx shadcn add https://cdn.jsdelivr.net/npm/@integr8-media/ui@<version>/dist/registry/button.json
+//   npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/button.json
 
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -40,10 +44,14 @@ const pkg = {
   version: pkgJson.version,
   homepage: pkgJson.homepage,
   dependencies: pkgJson.dependencies ?? {},
-  indexContent: await readFile(join(root, 'src', 'index.ts'), 'utf8'),
 };
 
-const items = buildRegistryItems(files, pkg, config);
+const styles = {
+  themeCss: await readFile(join(root, 'src', 'styles', 'theme.css'), 'utf8'),
+  fontsCss: await readFile(join(root, 'src', 'styles', 'fonts.css'), 'utf8'),
+};
+
+const items = buildRegistryItems(files, pkg, config, styles);
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });

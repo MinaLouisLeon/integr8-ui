@@ -26,13 +26,23 @@ The design system for every @integr8-media app: shadcn/ui components on Radix + 
 | `@integr8-media/ui/theme.css` | Tailwind v4 preset: theme tokens as CSS variables, `@theme inline` mapping, `@custom-variant dark` and `@custom-variant integr8`, tw-animate-css, and `@source` pointing at the package's built files so Tailwind sees its classes |
 | `@integr8-media/ui/styles.css` | Prebuilt CSS for apps without Tailwind: tokens + every class the components use |
 | `@integr8-media/ui/fonts.css` | `@font-face` rules for Inter, JetBrains Mono and Unbounded, bundled from Fontsource (no Google Fonts requests, works offline) |
-| `@integr8-media/ui/registry/<name>.json` | shadcn registry items, published inside the npm package; `registry.json` is the index |
+| `@integr8-media/ui/registry/<name>.json` | shadcn registry items, also published inside the npm package; `registry.json` is the index |
 
-**Using the registry:** `npx shadcn add https://cdn.jsdelivr.net/npm/@integr8-media/ui@<version>/dist/registry/button.json` copies a component into a project for heavy customizing. The registry is generated from the same source files at build time (`scripts/buildRegistry.mjs`, config `registry/registry.config.mjs`):
+**Using the registry (standalone, like shadcn/ui):** an app installs only what it needs, with no `@integr8-media/ui` package. The registry is hosted on GitHub Pages at `https://minalouisleon.github.io/integr8-ui/r/` (later a section of the website; the host is the `REGISTRY_BASE_URL` setting):
+
+```sh
+npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/theme.json   # once per project
+npx shadcn@latest add https://minalouisleon.github.io/integr8-ui/r/button.json
+```
+
+With `"registries": { "@integr8": "https://minalouisleon.github.io/integr8-ui/r/{name}.json" }` in `components.json`, `npx shadcn@latest add @integr8/button` works too. The registry is generated from the same source files (`scripts/buildRegistry.mjs`, config `registry/registry.config.mjs`):
 
 - One item per component file (`registry:ui`), hook (`registry:hook`) and shared helper (`registry:lib`); the name is the kebab-case file name (`DataTableColumnHeader.tsx` → `data-table-column-header`). `src/lib/cn.ts` becomes `utils` (`@/lib/utils`).
 - Relative imports become `@/components/ui/*`, `@/lib/*` or `@/hooks/*` and are listed as `registryDependencies` (full URLs); npm imports are listed as `dependencies` with the package's version ranges (react excluded).
-- Theme engine imports stay imports of `@integr8-media/ui` (only public exports are allowed; the build fails otherwise), so copies share the app's `ThemeProvider`. Every item's `docs` says to import `@integr8-media/ui/theme.css` for the tokens.
+- `theme` (`registry:item`): the whole theme engine (`src/theme/`) copied to `@/lib/theme/` with its file names and folders (so `ThemeProvider` is `@/lib/theme/ThemeProvider`), plus the tokens and styles of `theme.css`: Light → `cssVars.light` (`:root`), Dark → `cssVars.dark` (`.dark`), `@theme inline` → `cssVars.theme`, and Integr8, Integr8 Light, the `integr8` variant, the Integr8 extras and the reduced-motion rule → `css`. Integr8 selectors also match `:root[data-theme]` and `[data-theme].dark`, so they win over the project's own `:root` / `.dark` blocks. Components that use the theme (`ThemeSwitcher`, `Toaster`) import `@/lib/theme/*` and list `theme` as a registry dependency.
+- `fonts` (`registry:item`): the Fontsource `@import`s of `fonts.css` as CSS and the font packages as dependencies; `theme` depends on it.
+- Every component item's `docs` says to add `theme` once.
+- Hosting: `.github/workflows/registry.yml` builds the registry and a landing page (`scripts/buildRegistrySite.mjs` → `site/`) on every push to `main` and deploys it to GitHub Pages. Needs a shadcn CLI recent enough for `@lib/` target placeholders (`shadcn@latest`).
 
 ## Themes
 
@@ -470,7 +480,7 @@ src/
   components/<group>/      Button.tsx, DataTable.tsx, ... (theme/: ThemeSwitcher, GradientText, GrainOverlay)
   styles/                  theme.css, styles.entry.css, fonts.css
 registry/                  registry.config.mjs: generator config for the shadcn registry
-scripts/                   buildAssets.mjs, buildRegistry.mjs + registryItems.mjs (tested), fixtures.mjs
+scripts/                   buildAssets.mjs, buildRegistry.mjs + buildRegistrySite.mjs + registryItems.mjs (tested), fixtures.mjs
 fixtures/                  tailwind-app/, plain-app/, fixtures.spec.ts, playwright.config.ts
 playground/                Ladle config + stories (one per component, all themes)
 docs/SPEC.md
@@ -517,7 +527,7 @@ export function App() {
 - [ ] Integr8 theme matches the token table and uses Unbounded for headings; Integr8 Light matches its table
 - [ ] `theme.css` works in a fixture Tailwind v4 app; `styles.css` works in a fixture app without Tailwind
 - [ ] Fonts load offline from the package
-- [ ] Registry JSON generated for every component and installable with `npx shadcn add <url>`
+- [ ] Registry JSON generated for every component and installable with `npx shadcn add <url>` in a plain shadcn project, without `@integr8-media/ui` installed; hosted on GitHub Pages
 - [ ] Tests at 80% on logic; publint and attw pass; size budgets met
 - [ ] README with setup for Tailwind and non-Tailwind apps; TypeDoc API reference
 
@@ -542,3 +552,4 @@ Locked on 2026-11-06 (they replace the former open points).
 15. **`AppShell.stories.tsx`:** kept, in addition to one story file per component.
 16. **tw-animate-css:** on the approved runtime dependency list (`theme.css` imports it for the enter/exit animations).
 17. **`useOptionalTheme()`:** new public hook, `useTheme()` that returns `null` outside a provider. `Toaster` uses it, so its shadcn registry copy needs only public exports.
+18. **Standalone registry** (2026-11-06, replaces "theme imports stay imports of `@integr8-media/ui`"): the registry works without the npm package. The theme engine, tokens and fonts are registry items (`theme`, `fonts`); copied components import `@/lib/theme/*`. The registry is hosted on GitHub Pages (later the website) instead of jsDelivr. The npm package and its exports are unchanged.
