@@ -417,6 +417,8 @@ export {
   TableRow,
   type TableRowProps,
 } from './components/data-table/Table';
+// ---------- Date and time ----------
+export { Calendar, type CalendarProps, type DateRange } from './components/date/Calendar';
 // ---------- Feedback ----------
 export {
   EmptyState,

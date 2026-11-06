@@ -181,6 +181,7 @@ The Integr8 brand on a light base. Brand colors, fonts, radius and pills are the
 | Data table | ✅ DataTable (sorting, filtering, pagination, column visibility, row selection, optional virtualization hook-in), ✅ DataTableToolbar, ✅ DataTablePagination, ✅ DataTableColumnHeader, ✅ DataTableViewOptions, ✅ DataTableFacetedFilter, ✅ Table primitives (Table, TableHeader, TableBody, TableFooter, TableRow, TableHead, TableCell, TableCaption) | ✅ Done (7/7) |
 | App layout | ✅ Sidebar (collapsible, icon-only mode, floating/inset variants, sub menus, actions, rail, input, cookie persistence), ✅ PageHeader, ✅ SplitPanes (react-resizable-panels), ✅ StatusBar, ✅ Toolbar | ✅ Done (5/5) |
 | Theme | ✅ ThemeProvider, ✅ ThemeSwitcher, ✅ GradientText, ✅ GrainOverlay | ✅ Done (4/4) |
+| Date and time | Calendar, TimeInput, DatePicker, DateRangePicker, DateTimePicker, DateTimeRangePicker, DateField, DateRangeField, DateTimeField, DateTimeRangeField, TimeField (see [spec-calendar.md](spec-calendar.md)) | Not started (0/11) |
 
 ✅ = built in `src/components/<group>/` (or `src/theme/`), exported from `src/index.ts`, with a unit test and a Ladle story file per component (the form kit: one per ready field plus `Form.stories.tsx`; the data table: one per part).
 
@@ -188,6 +189,13 @@ The Integr8 brand on a light base. Brand colors, fonts, radius and pills are the
 - Accessibility comes from Radix; every interactive component is keyboard-usable and has visible focus (`ring` token).
 - Animations respect `prefers-reduced-motion`.
 - Menu-style items (DropdownMenu, ContextMenu, Menubar, Command) highlight with the `accent` token; their icons and shortcut hints switch to `accent-foreground` while highlighted so they stay readable (violet row in Integr8).
+
+### Date and time
+
+The date and time components have their own spec: **[docs/spec-calendar.md](spec-calendar.md)**. It holds the components, props, typed-input rules, styling, accessibility, folder layout (`src/components/date/`), tests, done-when list, progress table and locked decisions. That file is the source of truth for this group; this section only points to it.
+
+- New dependencies (approved in that spec): `react-day-picker` `^9` and `date-fns`.
+- Claude Code reads `docs/spec-calendar.md` only when the developer explicitly asks it to.
 
 ### Feedback and Command + menus API
 
