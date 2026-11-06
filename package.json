@@ -48,6 +48,7 @@
     "site:build": "node scripts/buildAssets.mjs && ladle build --config playground --outDir playground/dist --base /playground/ && npm run build:registry-site",
     "site": "npm run site:build && node scripts/serveSite.mjs",
     "size": "size-limit",
+    "size:why": "node scripts/sizeBreakdown.mjs",
     "fixtures": "node scripts/fixtures.mjs",
     "playground": "ladle serve --config playground",
     "playground:build": "ladle build --config playground --outDir playground/dist",
