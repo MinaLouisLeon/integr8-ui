@@ -1,6 +1,6 @@
 {
   "name": "@integr8-media/ui",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Design system for every @integr8-media app: shadcn/ui components on Radix + Tailwind v4, a theme engine with Light, Dark, System and Integr8 themes, a form kit, a data table, a command palette and app layout pieces.",
   "author": "Mina Louis Leon",
   "repository": {
@@ -45,6 +45,8 @@
     "build:css": "tailwindcss --input src/styles/styles.entry.css --output dist/styles.css --minify",
     "build:registry": "node scripts/buildRegistry.mjs",
     "build:registry-site": "node scripts/buildRegistry.mjs && node scripts/buildRegistrySite.mjs",
+    "site:build": "node scripts/buildAssets.mjs && ladle build --config playground --outDir playground/dist --base /playground/ && npm run build:registry-site",
+    "site": "npm run site:build && node scripts/serveSite.mjs",
     "size": "size-limit",
     "fixtures": "node scripts/fixtures.mjs",
     "playground": "ladle serve --config playground",

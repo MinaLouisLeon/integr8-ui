@@ -346,10 +346,19 @@ import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 - Copied components import `cn` from `@/lib/utils`, each other from `@/components/ui/*` and the
   theme from `@/lib/theme/*`; `shadcn add` installs what an item needs.
 - Items are generated from the same source files (`npm run build:registry`, config in
-  `registry/registry.config.mjs`). `npm run build:registry-site` also builds the landing page into
-  `site/`. `.github/workflows/registry.yml` deploys `site/` to GitHub Pages on every push to
-  `main`. To move the registry (for example to the website), set the `REGISTRY_BASE_URL`
-  repository variable to the new URL of the `r/` folder.
+  `registry/registry.config.mjs`). `npm run build:registry-site` builds the site into `site/`:
+  the landing page (`scripts/registryPage.mjs`, styled like integr8-media.com), the JSON in
+  `r/` and, when they are built, the fonts and the Ladle playground. The page lists every item
+  with search and copy buttons, and shows live previews from the playground.
+- Every item also gets a documentation page at `components/<name>/` (`scripts/itemPage.mjs`):
+  live preview of its stories in every theme, installation, usage, an API reference built from
+  the TSDoc comments (`scripts/sourceDocs.mjs`), and its source. Good TSDoc in `src/` is the
+  documentation: describe each export and prop, write defaults as "Default `x`", add
+  `@example` blocks, and mark non-public exports `@internal`.
+- `.github/workflows/registry.yml` builds the fonts, the playground and the registry, and deploys
+  `site/` to GitHub Pages on every push to `main`. To move the site (for example to a section of
+  the website), set the `REGISTRY_BASE_URL` (URL of the `r/` folder) and `SITE_BASE_PATH` (path
+  the site is served from, such as `/ui/`) repository variables.
 - The items are also in the npm package under `@integr8-media/ui/registry/*`.
 
 ## Non-goals
@@ -373,6 +382,8 @@ npm run playground        # Ladle at http://localhost:61000
 npm run playground:smoke  # builds the playground and runs Playwright on every story
 npm run fixtures          # packs the package and checks it in a Tailwind app and a plain app
 npm run docs              # TypeDoc API reference into docs/api/
+npm run site              # builds the registry site (fonts, playground, registry) and serves it on :4173
+npm run site:build        # the same build into site/, without the server
 ```
 
 - Unit tests sit next to the code in `src/`; shared test helpers are in `test/`; the registry
