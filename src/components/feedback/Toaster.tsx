@@ -7,14 +7,14 @@ import {
   OctagonXIcon,
   TriangleAlertIcon,
 } from 'lucide-react';
-import { type CSSProperties, type JSX, useContext } from 'react';
+import type { CSSProperties, JSX } from 'react';
 import {
   type ToasterProps as SonnerProps,
   Toaster as SonnerToaster,
   toast as sonnerToast,
 } from 'sonner';
 import { cn } from '../../lib/cn';
-import { ThemeContext } from '../../theme/themeContext';
+import { useOptionalTheme } from '../../theme/useTheme';
 
 /** Props for {@link Toaster}. All sonner `Toaster` props are supported. */
 export type ToasterProps = SonnerProps;
@@ -56,7 +56,8 @@ export function Toaster({
   toastOptions,
   ...props
 }: ToasterProps): JSX.Element {
-  const themeContext = useContext(ThemeContext);
+  // Public hook (not the internal context), so the shadcn registry copy works too.
+  const providerBase = useOptionalTheme()?.base;
   const tokenStyle = {
     '--normal-bg': 'var(--popover)',
     '--normal-text': 'var(--popover-foreground)',
@@ -67,7 +68,7 @@ export function Toaster({
 
   return (
     <SonnerToaster
-      theme={theme ?? themeContext?.base ?? 'system'}
+      theme={theme ?? providerBase ?? 'system'}
       className={cn('toaster group', className)}
       style={tokenStyle}
       icons={{

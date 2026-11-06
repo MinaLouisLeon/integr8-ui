@@ -361,6 +361,62 @@ export {
   formatShortcut,
   type ShortcutPlatform,
 } from './components/command/shortcutKeys';
+// ---------- Data table ----------
+export {
+  DataTable,
+  type DataTableProps,
+  type DataTableVirtualRow,
+  type DataTableVirtualRows,
+  type DataTableVirtualRowsHook,
+} from './components/data-table/DataTable';
+export {
+  DataTableColumnHeader,
+  type DataTableColumnHeaderProps,
+} from './components/data-table/DataTableColumnHeader';
+export {
+  DataTableFacetedFilter,
+  type DataTableFacetedFilterOption,
+  type DataTableFacetedFilterProps,
+} from './components/data-table/DataTableFacetedFilter';
+export {
+  DataTablePagination,
+  type DataTablePaginationProps,
+} from './components/data-table/DataTablePagination';
+export {
+  DataTableToolbar,
+  type DataTableToolbarProps,
+} from './components/data-table/DataTableToolbar';
+export {
+  DataTableViewOptions,
+  type DataTableViewOptionsProps,
+} from './components/data-table/DataTableViewOptions';
+export type {
+  DataTableColumn,
+  DataTableColumnDef,
+  DataTableFeatures,
+  DataTableInstance,
+  DataTableRow,
+  DataTableState,
+} from './components/data-table/dataTableFeatures';
+export type { DataTableLabels } from './components/data-table/dataTableLabels';
+export {
+  Table,
+  TableBody,
+  type TableBodyProps,
+  TableCaption,
+  type TableCaptionProps,
+  TableCell,
+  type TableCellProps,
+  TableFooter,
+  type TableFooterProps,
+  TableHead,
+  TableHeader,
+  type TableHeaderProps,
+  type TableHeadProps,
+  type TableProps,
+  TableRow,
+  type TableRowProps,
+} from './components/data-table/Table';
 // ---------- Feedback ----------
 export {
   EmptyState,
@@ -368,8 +424,131 @@ export {
   type EmptyStateVariant,
 } from './components/feedback/EmptyState';
 export { Toaster, type ToasterProps, toast } from './components/feedback/Toaster';
+// ---------- Form kit ----------
+export {
+  CheckboxField,
+  type CheckboxFieldProps,
+} from './components/form/CheckboxField';
+export {
+  Form,
+  FormControl,
+  type FormControlProps,
+  FormDescription,
+  type FormDescriptionProps,
+  FormError,
+  type FormErrorCode,
+  FormField,
+  type FormFieldProps,
+  FormItem,
+  type FormItemProps,
+  FormLabel,
+  type FormLabelProps,
+  FormMessage,
+  type FormMessageProps,
+  useFormField,
+} from './components/form/Form';
+export type { FieldBaseProps, FieldOption } from './components/form/fieldBase';
+export { NumberField, type NumberFieldProps } from './components/form/NumberField';
+export { PasswordField, type PasswordFieldProps } from './components/form/PasswordField';
+export { RadioField, type RadioFieldProps } from './components/form/RadioField';
+export { SelectField, type SelectFieldProps } from './components/form/SelectField';
+export { SwitchField, type SwitchFieldProps } from './components/form/SwitchField';
+export { TextareaField, type TextareaFieldProps } from './components/form/TextareaField';
+export { TextField, type TextFieldProps } from './components/form/TextField';
+export { type UseZodFormOptions, useZodForm } from './components/form/useZodForm';
+// ---------- App layout ----------
+export { PageHeader, type PageHeaderProps } from './components/layout/PageHeader';
+export {
+  Sidebar,
+  type SidebarCollapsible,
+  SidebarContent,
+  type SidebarContentProps,
+  type SidebarContextValue,
+  SidebarError,
+  type SidebarErrorCode,
+  SidebarFooter,
+  type SidebarFooterProps,
+  SidebarGroup,
+  SidebarGroupContent,
+  type SidebarGroupContentProps,
+  SidebarGroupLabel,
+  type SidebarGroupLabelProps,
+  type SidebarGroupProps,
+  SidebarHeader,
+  type SidebarHeaderProps,
+  SidebarInput,
+  type SidebarInputProps,
+  SidebarInset,
+  type SidebarInsetProps,
+  SidebarMenu,
+  SidebarMenuAction,
+  type SidebarMenuActionProps,
+  SidebarMenuBadge,
+  type SidebarMenuBadgeProps,
+  SidebarMenuButton,
+  type SidebarMenuButtonProps,
+  type SidebarMenuButtonSize,
+  SidebarMenuItem,
+  type SidebarMenuItemProps,
+  type SidebarMenuProps,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  type SidebarMenuSubButtonProps,
+  type SidebarMenuSubButtonSize,
+  SidebarMenuSubItem,
+  type SidebarMenuSubItemProps,
+  type SidebarMenuSubProps,
+  type SidebarProps,
+  SidebarProvider,
+  type SidebarProviderProps,
+  SidebarRail,
+  type SidebarRailProps,
+  SidebarSeparator,
+  type SidebarSeparatorProps,
+  type SidebarSide,
+  type SidebarState,
+  SidebarTrigger,
+  type SidebarTriggerProps,
+  type SidebarVariant,
+  useSidebar,
+} from './components/layout/Sidebar';
+export {
+  SplitPane,
+  type SplitPaneApi,
+  SplitPaneHandle,
+  type SplitPaneHandleProps,
+  type SplitPaneProps,
+  SplitPanes,
+  type SplitPanesApi,
+  type SplitPanesProps,
+} from './components/layout/SplitPanes';
+export {
+  StatusBar,
+  StatusBarItem,
+  type StatusBarItemProps,
+  type StatusBarProps,
+  StatusBarSection,
+  type StatusBarSectionProps,
+} from './components/layout/StatusBar';
+export {
+  Toolbar,
+  ToolbarButton,
+  type ToolbarButtonProps,
+  ToolbarLink,
+  type ToolbarLinkProps,
+  type ToolbarProps,
+  ToolbarSeparator,
+  type ToolbarSeparatorProps,
+  ToolbarToggleGroup,
+  type ToolbarToggleGroupProps,
+  ToolbarToggleItem,
+  type ToolbarToggleItemProps,
+} from './components/layout/Toolbar';
 
 // ---------- Theme and utilities ----------
+export { GradientText, type GradientTextProps } from './components/theme/GradientText';
+export { GrainOverlay, type GrainOverlayProps } from './components/theme/GrainOverlay';
+export { ThemeSwitcher, type ThemeSwitcherProps } from './components/theme/ThemeSwitcher';
 export { cn } from './lib/cn';
 export { type DefineThemeOptions, defineTheme } from './theme/defineTheme';
 export { ThemeProvider, type ThemeProviderProps } from './theme/ThemeProvider';
@@ -378,4 +557,4 @@ export { ThemeError, type ThemeErrorCode } from './theme/themeError';
 export { getThemeScript, type ThemeScriptOptions } from './theme/themeScript';
 export type { ThemeStorage } from './theme/themeStorage';
 export type { ThemeBase, ThemeDefinition, ThemeTokens, TokenName } from './theme/tokens';
-export { useTheme } from './theme/useTheme';
+export { useOptionalTheme, useTheme } from './theme/useTheme';

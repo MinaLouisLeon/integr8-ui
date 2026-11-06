@@ -1,6 +1,7 @@
 import type { ThemeBase, ThemeDefinition } from '../tokens';
 import { darkTheme } from './dark';
 import { integr8Theme } from './integr8';
+import { integr8LightTheme } from './integr8Light';
 import { lightTheme } from './light';
 
 /** The palettes that ship with the package, in menu order. `system` is not a palette. */
@@ -8,7 +9,11 @@ export const BUILT_IN_THEMES: readonly ThemeDefinition[] = Object.freeze([
   lightTheme,
   darkTheme,
   integr8Theme,
+  integr8LightTheme,
 ]);
+
+/** The Integr8 brand themes: they share pill shapes, display headings and lime selection. */
+export const INTEGR8_THEME_NAMES: readonly string[] = Object.freeze(['integr8', 'integr8-light']);
 
 /** The theme that follows the OS setting and resolves to `light` or `dark`. */
 export const SYSTEM_THEME = 'system';

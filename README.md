@@ -1,14 +1,11 @@
 # @integr8-media/ui
 
 The design system for every `@integr8-media` app: shadcn/ui components on Radix + Tailwind v4, a
-theme engine with four built-in themes (Light, Dark, System, Integr8), a form kit, a data table,
-a command palette and app layout pieces.
+theme engine with five built-in themes (Light, Dark, System, Integr8, Integr8 Light), a form kit,
+a data table, a command palette and app layout pieces.
 
-The full spec is in [docs/SPEC.md](docs/SPEC.md).
-
-> **Status: in progress.** Done so far: the theme engine (`ThemeProvider`, `useTheme`,
-> `defineTheme`, `getThemeScript`), `cn`, `theme.css`, `fonts.css` and the basic components.
-> Next: feedback, command and menus, form kit, data table, app layout, registry.
+The full spec is in [docs/SPEC.md](docs/SPEC.md). The API reference is generated from TSDoc with
+`npm run docs` (output in `docs/api/`).
 
 ## Requirements
 
@@ -30,26 +27,29 @@ npm install @integr8-media/ui
 /* app.css */
 @import "tailwindcss";
 @import "@integr8-media/ui/theme.css";
+@import "@integr8-media/ui/fonts.css";
 ```
 
 `theme.css` holds the theme tokens as CSS variables, maps them to Tailwind (`bg-primary`,
-`text-muted-foreground`, `rounded-lg`, `font-display`, ...), sets up the `dark:` variant and tells
-Tailwind to scan the package's built files for the classes its components use.
+`text-muted-foreground`, `rounded-lg`, `font-display`, ...), sets up the `dark:` and `integr8:`
+variants, imports the enter/exit animations (tw-animate-css) and tells Tailwind to scan the
+package's built files for the classes its components use. Your own markup can use the same
+utilities: `bg-card`, `text-brand-1`, `dark:...`, `integr8:rounded-full`.
 
 ### Apps without Tailwind
 
 ```ts
+import '@integr8-media/ui/fonts.css';
 import '@integr8-media/ui/styles.css';
 ```
 
+`styles.css` is prebuilt: the tokens plus every class the components use. It does not contain
+utilities for your own markup.
+
 ### Fonts
 
-```ts
-import '@integr8-media/ui/fonts.css';
-```
-
-Inter, JetBrains Mono and Unbounded, bundled from Fontsource. No Google Fonts requests; works
-offline.
+`fonts.css` bundles Inter, JetBrains Mono and Unbounded from Fontsource. The font files ship in
+the package: no Google Fonts requests, works offline.
 
 ## Themes
 
@@ -58,14 +58,16 @@ offline.
 | `light` | light | Neutral palette, violet accent |
 | `dark` | dark | Neutral palette, violet accent |
 | `system` | follows OS | Resolves to `light` or `dark`, live |
-| `integr8` | dark | The integr8-media.com look: lime primary, violet accent, Unbounded headings |
+| `integr8` | dark | The integr8-media.com look: lime primary, violet accent, Unbounded headings, pill buttons |
+| `integr8-light` | light | The Integr8 brand on a light base: deep violet primary, same fonts and pills |
 
 ```tsx
-import { ThemeProvider, useTheme } from '@integr8-media/ui';
+import { ThemeProvider, ThemeSwitcher, useTheme } from '@integr8-media/ui';
 
 export function App() {
   return (
     <ThemeProvider defaultTheme="system">
+      <ThemeSwitcher /> {/* a menu of every theme */}
       <Page />
     </ThemeProvider>
   );
@@ -79,6 +81,25 @@ function Page() {
 
 The provider sets `data-theme="<resolved theme>"` on `<html>` (or on `target`) and adds the
 `dark` class for dark-based themes, so Tailwind's `dark:` variant works.
+
+### Integr8 extras
+
+Active only in the two Integr8 themes:
+
+- Headings use Unbounded (`font-display`); buttons, badges and tabs are pills; text selection is
+  lime.
+- `<GradientText>` fills text with the website's violet → cyan → lime gradient. In other themes
+  it is plain text, so it can stay in place while the user switches themes.
+- `<GrainOverlay />` adds the film-grain texture over the page (or `cover="parent"` for one
+  section). It is not rendered when the user prefers reduced motion. It is opt-in: leave it out
+  of dense tool UIs such as an IDE.
+
+```tsx
+<h1>
+  Build the future, <GradientText>integrated</GradientText>.
+</h1>
+<GrainOverlay />
+```
 
 ### Saving the theme
 
@@ -144,13 +165,14 @@ font-display, font-mono`.
 
 The theme engine throws `ThemeError` with a `code`: `UNKNOWN_THEME` (unregistered name passed
 to `setTheme` or `defaultTheme`), `INVALID_THEME` (bad `defineTheme` input or a duplicate theme
-name) or `MISSING_PROVIDER` (`useTheme` outside `ThemeProvider`).
+name) or `MISSING_PROVIDER` (`useTheme` or `ThemeSwitcher` outside `ThemeProvider`).
 
 ## Components
 
 shadcn/ui components on Radix, styled only through the theme tokens. Every component accepts
 `className` (merged with `cn`, so your classes win), takes a `ref` (React 19 ref-as-prop) and
-sets a `data-slot` attribute you can target in CSS.
+sets a `data-slot` attribute you can target in CSS. Animations finish at once when the user
+prefers reduced motion (the `Spinner` keeps turning).
 
 **Basics:** Accordion, Alert, AlertDialog, Avatar, Badge, Breadcrumb, Button, Card, Checkbox,
 Collapsible, Dialog, DropdownMenu, HoverCard, Input, Kbd, Label, Popover, Progress, RadioGroup,
@@ -165,42 +187,147 @@ and Shortcut, which shows a shortcut in the user's OS style (`⌘⇧P` on Apple 
 `Ctrl+Shift+P` elsewhere). `formatShortcut(keys, platform)` gives the same labels as strings.
 
 ```tsx
-import { Shortcut, Toaster, toast } from '@integr8-media/ui';
-
 <Shortcut keys="mod+shift+p" />;              // ⌘ ⇧ P  or  Ctrl Shift P
 <Shortcut keys="mod+s" variant="text" />;     // ⌘S     or  Ctrl+S (for menu items)
-
 toast.success('Saved'); // needs one <Toaster /> mounted near the app root
 ```
 
-```tsx
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@integr8-media/ui';
+**Theme:** ThemeProvider, ThemeSwitcher, GradientText, GrainOverlay (see [Themes](#themes)).
 
-<Dialog>
-  <DialogTrigger asChild>
-    <Button variant="outline">Edit profile</Button>
-  </DialogTrigger>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Edit profile</DialogTitle>
-      <DialogDescription>Changes are saved when you click Save.</DialogDescription>
-    </DialogHeader>
-  </DialogContent>
-</Dialog>;
+### Form kit
+
+react-hook-form + zod v4. `useZodForm` types the values from the schema; ready fields wire the
+label, description, error message and ARIA attributes.
+
+```tsx
+import { Button, Form, PasswordField, SwitchField, TextField, useZodForm } from '@integr8-media/ui';
+import { z } from 'zod';
+
+const schema = z.object({
+  email: z.email('Enter a valid email'),
+  password: z.string().min(8, 'At least 8 characters'),
+  newsletter: z.boolean(),
+});
+
+function SignUp() {
+  const form = useZodForm(schema, { defaultValues: { email: '', password: '', newsletter: true } });
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit((values) => save(values))}>
+        <TextField name="email" label="Email" type="email" />
+        <PasswordField name="password" label="Password" autoComplete="new-password" />
+        <SwitchField name="newsletter" label="Newsletter" />
+        <Button type="submit">Create account</Button>
+      </form>
+    </Form>
+  );
+}
 ```
 
-- In the Integr8 theme, buttons, badges and tabs are pills and card titles use Unbounded.
-- Overlays animate with [tw-animate-css](https://github.com/Wombosvideo/tw-animate-css), which
-  `theme.css` imports. When the user prefers reduced motion, animations finish at once (the
-  `Spinner` keeps turning).
+Ready fields: TextField, PasswordField, NumberField, TextareaField, SelectField, CheckboxField,
+SwitchField, RadioField. For a custom control, use the parts: FormField, FormItem, FormLabel,
+FormControl, FormDescription, FormMessage.
+
+### Data table
+
+On TanStack Table **v9**: sorting, search, column filters, faceted filters, pagination, column
+visibility, row selection and a hook-in for row virtualization. Each piece of state can be
+controlled with its prop and `on*Change`, or left to the table; `manual*` props hand sorting,
+filtering or paging to the server.
+
+```tsx
+import {
+  DataTable,
+  type DataTableColumnDef,
+  DataTableColumnHeader,
+  DataTableFacetedFilter,
+  DataTableToolbar,
+} from '@integr8-media/ui';
+
+const columns: DataTableColumnDef<Task>[] = [
+  { accessorKey: 'title', header: ({ column }) => <DataTableColumnHeader column={column} title="Title" /> },
+  { accessorKey: 'status', header: 'Status', filterFn: 'oneOf' },
+];
+
+<DataTable
+  columns={columns}
+  data={tasks}
+  getRowId={(task) => task.id}
+  enableRowSelection
+  toolbar={(table) => (
+    <DataTableToolbar table={table}>
+      <DataTableFacetedFilter column={table.getColumn('status')} title="Status" options={STATUSES} />
+    </DataTableToolbar>
+  )}
+/>;
+```
+
+- Column types: `DataTableColumnDef<TData>` is TanStack's `ColumnDef<DataTableFeatures, TData>`.
+  Use `DataTableFeatures` for your own TanStack helpers, for example
+  `createColumnHelper<DataTableFeatures, Task>()`.
+- Read the table state in a custom toolbar with `table.state` (v9), for example
+  `table.state.pagination`.
+- `labels` translates every text the table shows.
+- For simple static tables, use the `Table` primitives (`Table`, `TableHeader`, `TableBody`,
+  `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`): same look, no TanStack.
+
+### App layout
+
+Sidebar, PageHeader, SplitPanes (react-resizable-panels v4), StatusBar and Toolbar.
+
+```tsx
+<SidebarProvider persist="cookie">
+  <Sidebar collapsible="icon" variant="inset">
+    <SidebarHeader>
+      <SidebarInput type="search" aria-label="Search" placeholder="Search…" />
+    </SidebarHeader>
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupLabel>Project</SidebarGroupLabel>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton isActive tooltip="Files">
+              <FilesIcon />
+              <span>Files</span>
+            </SidebarMenuButton>
+            <SidebarMenuAction aria-label="New file" showOnHover>
+              <PlusIcon />
+            </SidebarMenuAction>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroup>
+    </SidebarContent>
+    <SidebarRail />
+  </Sidebar>
+  <SidebarInset>
+    <SidebarTrigger />
+  </SidebarInset>
+</SidebarProvider>
+```
+
+- Sidebar: `collapsible` `icon` / `offcanvas` / `none`; `variant` `sidebar` / `floating` /
+  `inset`; nested menus with `SidebarMenuSub*`; ⌘B / Ctrl+B toggles. Save the state yourself
+  with `open` / `onOpenChange`, or pass `persist="cookie"` (cookie `sidebar_state`).
+- SplitPanes sizes follow react-resizable-panels v4: numbers are pixels, strings take units
+  (`'25%'`, `'16rem'`).
+
+## shadcn registry
+
+Every component is also published as a shadcn registry item inside the npm package, for when an
+app needs its own copy to customize heavily:
+
+```sh
+npx shadcn add https://cdn.jsdelivr.net/npm/@integr8-media/ui@<version>/dist/registry/button.json
+```
+
+- Items are generated at build time from the same source files (`npm run build:registry`,
+  config in `registry/registry.config.mjs`). `dist/registry/registry.json` lists them all.
+- Item names are the kebab-case file names: `data-table`, `sidebar`, `theme-switcher`, ...
+- Copied components import `cn` from `@/lib/utils` and each other from `@/components/ui/*`;
+  `shadcn add` installs the components an item needs.
+- They still need the theme tokens: install `@integr8-media/ui` and add
+  `@import "@integr8-media/ui/theme.css";`. Theme engine imports (`useTheme`, ...) stay imports
+  of the package, so copies share the app's `ThemeProvider`.
 
 ## Non-goals
 
@@ -216,12 +343,19 @@ npm install
 npm run lint
 npm run typecheck
 npm run test:coverage
-npm run build
-npm run check:exports
+npm run build             # JS, CSS, fonts and the registry into dist/
+npm run size              # size budgets (after build)
+npm run check:exports     # publint + attw
 npm run playground        # Ladle at http://localhost:61000
 npm run playground:smoke  # builds the playground and runs Playwright on every story
+npm run fixtures          # packs the package and checks it in a Tailwind app and a plain app
+npm run docs              # TypeDoc API reference into docs/api/
 ```
 
-- Unit tests sit next to the code in `src/`; shared test helpers are in `test/`.
-- Stories live in `playground/`; the toolbar above each story switches Light / Dark / System /
-  Integr8.
+- Unit tests sit next to the code in `src/`; shared test helpers are in `test/`; the registry
+  generator's tests are in `scripts/`.
+- Stories live in `playground/`, one file per component; the toolbar above each story switches
+  every theme.
+- `fixtures/` holds two tiny Vite apps that install the packed package: `tailwind-app` uses
+  `theme.css` with Tailwind v4, `plain-app` uses `styles.css`. `npm run fixtures` builds them
+  and runs `fixtures/fixtures.spec.ts` (styles applied, themes switch, fonts load offline).

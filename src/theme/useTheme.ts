@@ -26,3 +26,19 @@ export function useTheme(): ThemeContextValue {
   }
   return value;
 }
+
+/**
+ * Like {@link useTheme}, but returns `null` outside a `ThemeProvider` instead of throwing. For
+ * theme-aware parts that must also work without a provider, such as `Toaster`.
+ *
+ * @example
+ * ```tsx
+ * function Logo() {
+ *   const base = useOptionalTheme()?.base ?? 'light';
+ *   return <img src={base === 'dark' ? '/logo-light.svg' : '/logo-dark.svg'} alt="Integr8" />;
+ * }
+ * ```
+ */
+export function useOptionalTheme(): ThemeContextValue | null {
+  return useContext(ThemeContext);
+}

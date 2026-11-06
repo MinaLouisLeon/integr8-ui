@@ -59,7 +59,7 @@ export function CardTitle({ className, ...props }: CardTitleProps): JSX.Element 
   return (
     <div
       data-slot="card-title"
-      className={cn('leading-none font-semibold in-data-[theme=integr8]:font-display', className)}
+      className={cn('leading-none font-semibold integr8:font-display', className)}
       {...props}
     />
   );

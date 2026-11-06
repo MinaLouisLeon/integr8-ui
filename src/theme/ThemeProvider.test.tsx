@@ -130,6 +130,21 @@ describe('ThemeProvider', () => {
       expect(root.classList.contains('dark')).toBe(false);
     });
 
+    it('applies integr8-light as a light-based theme', () => {
+      render(
+        <ThemeProvider defaultTheme="integr8">
+          <Probe />
+        </ThemeProvider>,
+      );
+      expect(root.classList.contains('dark')).toBe(true);
+
+      act(() => current.setTheme('integr8-light'));
+      expect(current.resolvedTheme).toBe('integr8-light');
+      expect(current.base).toBe('light');
+      expect(root.getAttribute('data-theme')).toBe('integr8-light');
+      expect(root.classList.contains('dark')).toBe(false);
+    });
+
     it('saves to localStorage under integr8-theme by default', () => {
       render(
         <ThemeProvider>
@@ -284,6 +299,7 @@ describe('ThemeProvider', () => {
         'light',
         'dark',
         'integr8',
+        'integr8-light',
         'ocean',
         'paper',
       ]);
