@@ -199,11 +199,11 @@ The work is split into five milestones. Each is its own `feature/*` branch from 
 
 | # | Milestone | Contents | Depends on | Branch | Status |
 |---|---|---|---|---|---|
-| 1 | Calendar base | Dependencies approved (react-day-picker `^9`, date-fns); `Calendar` (all modes, display-only); `calendar` registry item. Unblocks the window-manager clock | none | `feature/calendar` | In progress (code written, developer checks pending) |
-| 2 | Time input | `time.ts` (`toTime`, `withTime`); `TimeInput`; `TimeField` | none (can run alongside 1) | `feature/time-input` | Not started |
-| 3 | Date picker | `parseDateInput` and typed-input behavior; `DatePicker`; `DateField`; `DatePicker` size budget | 1 | `feature/date-picker` | Not started |
-| 4 | Date range picker | `rangePresets`; `DateRangePicker`; `DateRangeField` | 3 | `feature/date-range-picker` | Not started |
-| 5 | Date-time pickers | `DateTimePicker`, `DateTimeRangePicker`; `DateTimeField`, `DateTimeRangeField`; remaining size budgets; README section; fixture-app check (`npx shadcn add @integr8-media/calendar`) | 2, 3, 4 | `feature/date-time-pickers` | Not started |
+| 1 | Calendar base | Dependencies approved (react-day-picker `^9`, date-fns); `Calendar` (all modes, display-only); `calendar` registry item. Unblocks the window-manager clock | none | `feature/calendar` | Done (merged, PR #21) |
+| 2 | Time input | `time.ts` (`toTime`, `withTime`); `TimeInput`; `TimeField` | none (can run alongside 1) | `feature/time-input` | Done (merged, PR #22) |
+| 3 | Date picker | `parseDateInput` and typed-input behavior; `DatePicker`; `DateField`; `DatePicker` size budget | 1 | `feature/date-picker` | In progress (code written on `feature/date-time-pickers`, developer checks pending) |
+| 4 | Date range picker | `rangePresets`; `DateRangePicker`; `DateRangeField` | 3 | `feature/date-range-picker` | In progress (code written on `feature/date-time-pickers`, developer checks pending) |
+| 5 | Date-time pickers | `DateTimePicker`, `DateTimeRangePicker`; `DateTimeField`, `DateTimeRangeField`; remaining size budgets; README section; fixture-app check (`npx shadcn add @integr8-media/calendar`) | 2, 3, 4 | `feature/date-time-pickers` | In progress (code written, developer checks pending; fixture-app check not done) |
 
 - Milestone 3 sets the typed-input pattern (parse, invalid state, Esc restore, `aria-invalid`) that milestones 4 and 5 reuse.
 - If milestone 5 is too large to review, split it into `DateTimePicker` + `DateTimeField`, then `DateTimeRangePicker` + `DateTimeRangeField`.

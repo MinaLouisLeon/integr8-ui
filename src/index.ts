@@ -419,8 +419,32 @@ export {
 } from './components/data-table/Table';
 // ---------- Date and time ----------
 export { Calendar, type CalendarProps, type DateRange } from './components/date/Calendar';
+export { DateField, type DateFieldProps } from './components/date/DateField';
+export { DatePicker, type DatePickerProps } from './components/date/DatePicker';
+export { DateRangeField, type DateRangeFieldProps } from './components/date/DateRangeField';
+export { DateRangePicker, type DateRangePickerProps } from './components/date/DateRangePicker';
+export { DateTimeField, type DateTimeFieldProps } from './components/date/DateTimeField';
+export { DateTimePicker, type DateTimePickerProps } from './components/date/DateTimePicker';
+export {
+  DateTimeRangeField,
+  type DateTimeRangeFieldProps,
+} from './components/date/DateTimeRangeField';
+export {
+  DateTimeRangePicker,
+  type DateTimeRangePickerProps,
+} from './components/date/DateTimeRangePicker';
+export {
+  DEFAULT_PARSE_FORMATS,
+  type InvalidInputReason,
+  type ParseDateInputOptions,
+  type ParseDateInputResult,
+  parseDateInput,
+} from './components/date/parseDateInput';
+export { type RangePreset, rangePresets } from './components/date/rangePresets';
 export { TimeField, type TimeFieldProps } from './components/date/TimeField';
 export { TimeInput, type TimeInputProps } from './components/date/TimeInput';
+export { TimePicker, type TimePickerProps } from './components/date/TimePicker';
+export { TimePickerField, type TimePickerFieldProps } from './components/date/TimePickerField';
 export {
   type Time,
   TimeError,
