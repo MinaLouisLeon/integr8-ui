@@ -30,7 +30,7 @@ describe('Button', () => {
 
   it('becomes a pill inside the Integr8 theme', () => {
     render(<Button>Go</Button>);
-    expect(screen.getByRole('button').className).toContain('in-data-[theme=integr8]:rounded-full');
+    expect(screen.getByRole('button').className).toContain('integr8:rounded-full');
   });
 
   it('lets className win over its own classes', () => {

@@ -46,9 +46,9 @@ describe('Tabs', () => {
   it('uses pill tabs in the Integr8 theme', () => {
     render(<Example />);
 
-    expect(screen.getByRole('tablist').className).toContain('in-data-[theme=integr8]:rounded-full');
+    expect(screen.getByRole('tablist').className).toContain('integr8:rounded-full');
     expect(screen.getByRole('tab', { name: 'Account' }).className).toContain(
-      'in-data-[theme=integr8]:rounded-full',
+      'integr8:rounded-full',
     );
   });
 });

@@ -1,14 +1,6 @@
-import type { ColumnDef, Table } from '@tanstack/react-table';
 import { type Context, createContext, useContext } from 'react';
 
-/**
- * A column of a {@link DataTable}: a TanStack Table v8 `ColumnDef`. Use `accessorKey` or
- * `accessorFn` for data columns and `id` for display columns (such as an actions menu).
- */
-export type DataTableColumnDef<TData, TValue = unknown> = ColumnDef<TData, TValue>;
-
-/** The TanStack Table v8 instance behind a {@link DataTable}, as passed to the toolbar parts. */
-export type DataTableInstance<TData> = Table<TData>;
+export type { DataTableColumnDef, DataTableInstance } from './dataTableFeatures';
 
 /**
  * Every text the data table shows. Pass a partial object to `DataTable`'s `labels` prop to
@@ -51,6 +43,12 @@ export interface DataTableLabels {
   selectAll: string;
   /** Row checkbox of the selection column. Default `'Select row'`. */
   selectRow: string;
+  /** Shown in a faceted filter's list when the search matches no option. Default `'No results.'`. */
+  facetNoResults: string;
+  /** Faceted filter item that clears the column's filter. Default `'Clear filters'`. */
+  clearFilter: string;
+  /** Badge text when more options are selected than fit. Default `'3 selected'`. */
+  facetSelected: (count: number) => string;
 }
 
 /** The English texts used when no `labels` are given. */
@@ -73,6 +71,9 @@ export const defaultDataTableLabels: DataTableLabels = {
   lastPage: 'Go to last page',
   selectAll: 'Select all',
   selectRow: 'Select row',
+  facetNoResults: 'No results.',
+  clearFilter: 'Clear filters',
+  facetSelected: (count) => `${count} selected`,
 };
 
 /** @internal Labels of the surrounding DataTable. */

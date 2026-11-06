@@ -20,7 +20,7 @@ const badgeVariants = cva(
     'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
     '[&>svg]:pointer-events-none [&>svg]:size-3',
     // Integr8 theme: pill badges, like integr8-media.com.
-    'in-data-[theme=integr8]:rounded-full',
+    'integr8:rounded-full',
   ],
   {
     variants: {

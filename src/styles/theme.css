@@ -17,6 +17,9 @@
 /* `dark:` applies inside any element with the `dark` class (set by ThemeProvider). */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* `integr8:` applies inside either Integr8 theme (pill buttons, display headings, ...). */
+@custom-variant integr8 (&:where([data-theme="integr8"] *, [data-theme="integr8-light"] *));
+
 /* ---------- Light (also the default before a theme is applied) ---------- */
 :root,
 [data-theme="light"] {
@@ -126,6 +129,42 @@
   color-scheme: dark;
 }
 
+/* ---------- Integr8 Light (the Integr8 brand on a light base) ---------- */
+[data-theme="integr8-light"] {
+  --background: #f7f6fc;
+  --foreground: #0d0b16;
+  --card: #ffffff;
+  --card-foreground: #0d0b16;
+  --popover: #ffffff;
+  --popover-foreground: #0d0b16;
+  --primary: #5b3df5;
+  --primary-foreground: #ffffff;
+  --secondary: #efedf7;
+  --secondary-foreground: #0d0b16;
+  --muted: #efedf7;
+  --muted-foreground: #5d5873;
+  --accent: #7c5cff;
+  --accent-foreground: #ffffff;
+  --destructive: #d61f45;
+  --destructive-foreground: #ffffff;
+  --success: #11845a;
+  --warning: #a35f00;
+  --info: #0e7490;
+  --border: rgba(13, 11, 22, 0.1);
+  --input: rgba(13, 11, 22, 0.14);
+  --ring: #7c5cff;
+  --brand-1: #7c5cff;
+  --brand-2: #22d3ee;
+  --brand-3: #c6ff3d;
+  --brand-4: #ff4fd8;
+  --radius: 1rem;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Unbounded", "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+
 /* ---------- Tailwind mapping: bg-primary, text-muted-foreground, rounded-lg, font-display ... ---------- */
 @theme inline {
   --color-background: var(--background);
@@ -183,14 +222,76 @@
     font-family: var(--font-sans);
   }
 
-  /* Integr8 extras: display font on headings and lime text selection. */
-  [data-theme="integr8"] :is(h1, h2, h3, h4, h5, h6) {
+  /* Integr8 extras (both Integr8 themes): display font on headings and lime text selection. */
+  :is([data-theme="integr8"], [data-theme="integr8-light"]) :is(h1, h2, h3, h4, h5, h6) {
     font-family: var(--font-display);
   }
 
-  [data-theme="integr8"] ::selection {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
+  :is([data-theme="integr8"], [data-theme="integr8-light"]) ::selection {
+    background-color: var(--brand-3);
+    color: #07060b;
+  }
+}
+
+/*
+ * ---------- Integr8 extras: GradientText and GrainOverlay ----------
+ * Both are active only inside an Integr8 theme. Elsewhere GradientText is plain text and the
+ * grain is hidden, so an app can leave them in place while the user switches themes.
+ */
+@layer components {
+  /* Film grain: an SVG noise tile over everything, ignoring the pointer. Hidden by default. */
+  [data-slot="grain-overlay"] {
+    display: none;
+    position: var(--grain-position, fixed);
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+    opacity: var(--grain-opacity, 0.06);
+    mix-blend-mode: overlay;
+  }
+
+  [data-slot="grain-overlay"][data-animated] {
+    animation: integr8-grain 0.8s steps(4) infinite;
+  }
+
+  :is([data-theme="integr8"], [data-theme="integr8-light"]) [data-slot="grain-overlay"] {
+    display: block;
+  }
+
+  /* The website's violet → cyan → lime gradient, clipped to the text. */
+  :is([data-theme="integr8"], [data-theme="integr8-light"]) [data-slot="gradient-text"] {
+    background-image: linear-gradient(
+      var(--gradient-text-angle, 90deg),
+      var(--brand-1),
+      var(--brand-2),
+      var(--brand-3)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+}
+
+@keyframes integr8-grain {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: -40px 24px;
+  }
+  50% {
+    background-position: 32px -48px;
+  }
+  75% {
+    background-position: -24px -16px;
+  }
+  100% {
+    background-position: 0 0;
   }
 }
 
@@ -209,5 +310,10 @@
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
     transition-duration: 0.01ms;
+  }
+
+  /* The film grain is decoration only: drop it entirely. */
+  [data-slot="grain-overlay"] {
+    display: none;
   }
 }

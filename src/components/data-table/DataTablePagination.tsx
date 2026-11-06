@@ -1,6 +1,6 @@
 'use client';
 
-import type { Table } from '@tanstack/react-table';
+import type { RowData } from '@tanstack/react-table';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -11,15 +11,16 @@ import { type ComponentProps, type JSX, useId } from 'react';
 import { cn } from '../../lib/cn';
 import { Button } from '../basics/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../basics/Select';
+import type { DataTableInstance } from './dataTableFeatures';
 import { useDataTableLabels } from './dataTableLabels';
 
 /** Page sizes offered by {@link DataTablePagination} when none are given. */
 const DEFAULT_PAGE_SIZE_OPTIONS: readonly number[] = [10, 20, 30, 50, 100];
 
 /** Props for {@link DataTablePagination}. */
-export type DataTablePaginationProps<TData> = ComponentProps<'div'> & {
+export type DataTablePaginationProps<TData extends RowData> = ComponentProps<'div'> & {
   /** The table instance. */
-  table: Table<TData>;
+  table: DataTableInstance<TData>;
   /** Choices in the "Rows per page" select. Default `[10, 20, 30, 50, 100]`. */
   pageSizeOptions?: readonly number[] | undefined;
 };
@@ -33,7 +34,7 @@ export type DataTablePaginationProps<TData> = ComponentProps<'div'> & {
  * <DataTablePagination table={table} pageSizeOptions={[25, 50, 100]} />
  * ```
  */
-export function DataTablePagination<TData>({
+export function DataTablePagination<TData extends RowData>({
   table,
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   className,
@@ -41,7 +42,7 @@ export function DataTablePagination<TData>({
 }: DataTablePaginationProps<TData>): JSX.Element {
   const labels = useDataTableLabels();
   const labelId = useId();
-  const { pageIndex, pageSize } = table.getState().pagination;
+  const { pageIndex, pageSize } = table.state.pagination;
   const pageCount = Math.max(1, table.getPageCount());
   // Keep the current size selectable even when it is not one of the options.
   const sizes = [...new Set([...pageSizeOptions, pageSize])].sort((a, b) => a - b);

@@ -10,7 +10,7 @@ describe('Badge', () => {
     expect(badge.tagName).toBe('SPAN');
     expect(badge.dataset.slot).toBe('badge');
     expect(badge.className).toContain('bg-primary');
-    expect(badge.className).toContain('in-data-[theme=integr8]:rounded-full');
+    expect(badge.className).toContain('integr8:rounded-full');
   });
 
   it.each([

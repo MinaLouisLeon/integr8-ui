@@ -2,21 +2,16 @@
 
 import {
   type ColumnFiltersState,
+  type ColumnVisibilityState,
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   type Header,
-  type InitialTableState,
   type OnChangeFn,
   type PaginationState,
-  type Row,
+  type RowData,
   type RowSelectionState,
   type SortingState,
-  type TableState,
-  useReactTable,
-  type VisibilityState,
+  type Table,
+  useTable,
 } from '@tanstack/react-table';
 import {
   type ComponentProps,
@@ -33,7 +28,13 @@ import { DataTablePagination } from './DataTablePagination';
 import { DataTableToolbar } from './DataTableToolbar';
 import {
   type DataTableColumnDef,
+  type DataTableFeatures,
   type DataTableInstance,
+  type DataTableRow,
+  type DataTableState,
+  dataTableFeatures,
+} from './dataTableFeatures';
+import {
   type DataTableLabels,
   DataTableLabelsContext,
   defaultDataTableLabels,
@@ -75,25 +76,28 @@ export interface DataTableVirtualRows {
  * }
  * ```
  */
-export type DataTableVirtualRowsHook<TData> = (
-  rows: readonly Row<TData>[],
+export type DataTableVirtualRowsHook<TData extends RowData> = (
+  rows: readonly DataTableRow<TData>[],
   getScrollElement: () => HTMLDivElement | null,
 ) => DataTableVirtualRows | null;
 
 /** Props for {@link DataTable}. */
-export type DataTableProps<TData, TValue = unknown> = Omit<ComponentProps<'div'>, 'children'> & {
+export type DataTableProps<TData extends RowData, TValue = unknown> = Omit<
+  ComponentProps<'div'>,
+  'children'
+> & {
   /** Column definitions. Use {@link DataTableColumnHeader} as `header` for sortable columns. */
   columns: DataTableColumnDef<TData, TValue>[];
   /** The rows. Keep the array stable between renders (state or `useMemo`). */
   data: TData[];
   /** A stable id for each row. Default: the row index. Set it when rows can be selected. */
-  getRowId?: ((row: TData, index: number, parent?: Row<TData>) => string) | undefined;
+  getRowId?: ((row: TData, index: number, parent?: DataTableRow<TData>) => string) | undefined;
 
   /**
    * Add a checkbox column to select rows. Pass a function to allow selecting only some rows.
    * Default `false`.
    */
-  enableRowSelection?: boolean | ((row: Row<TData>) => boolean) | undefined;
+  enableRowSelection?: boolean | ((row: DataTableRow<TData>) => boolean) | undefined;
   /** Allow sorting. Each column can still turn it off with `enableSorting: false`. Default `true`. */
   enableSorting?: boolean | undefined;
   /** Allow sorting by several columns with Shift+click. Default `true`. */
@@ -128,15 +132,15 @@ export type DataTableProps<TData, TValue = unknown> = Omit<ComponentProps<'div'>
   /** Called when the page or page size changes. */
   onPaginationChange?: OnChangeFn<PaginationState> | undefined;
   /** Which columns are visible (`{ columnId: false }` hides one), to control it from outside. */
-  columnVisibility?: VisibilityState | undefined;
+  columnVisibility?: ColumnVisibilityState | undefined;
   /** Called when a column is shown or hidden. */
-  onColumnVisibilityChange?: OnChangeFn<VisibilityState> | undefined;
+  onColumnVisibilityChange?: OnChangeFn<ColumnVisibilityState> | undefined;
   /** Selected rows (`{ rowId: true }`), to control them from outside. */
   rowSelection?: RowSelectionState | undefined;
   /** Called when the selection changes. */
   onRowSelectionChange?: OnChangeFn<RowSelectionState> | undefined;
   /** Starting state for anything not controlled (for example a default sort). */
-  initialState?: InitialTableState | undefined;
+  initialState?: Partial<DataTableState> | undefined;
 
   /** The server sorts: `data` is already sorted. Default `false`. */
   manualSorting?: boolean | undefined;
@@ -163,8 +167,13 @@ export type DataTableProps<TData, TValue = unknown> = Omit<ComponentProps<'div'>
 /** The column id of the selection checkbox column added by `enableRowSelection`. */
 const SELECT_COLUMN_ID = 'select';
 
-function SelectAllCheckbox<TData>({ table }: { table: DataTableInstance<TData> }): JSX.Element {
+function SelectAllCheckbox<TData extends RowData>({
+  table,
+}: {
+  table: Table<DataTableFeatures, TData>;
+}): JSX.Element {
   const labels = useDataTableLabels();
+  // v9: "some" is also true when every row is selected, so check "all" first.
   return (
     <Checkbox
       className="translate-y-0.5"
@@ -181,7 +190,11 @@ function SelectAllCheckbox<TData>({ table }: { table: DataTableInstance<TData> }
   );
 }
 
-function SelectRowCheckbox<TData>({ row }: { row: Row<TData> }): JSX.Element {
+function SelectRowCheckbox<TData extends RowData>({
+  row,
+}: {
+  row: DataTableRow<TData>;
+}): JSX.Element {
   const labels = useDataTableLabels();
   return (
     <Checkbox
@@ -195,7 +208,7 @@ function SelectRowCheckbox<TData>({ row }: { row: Row<TData> }): JSX.Element {
 }
 
 // Labels come from context, so the column (and the column list) stays stable.
-function selectColumn<TData>(): DataTableColumnDef<TData> {
+function selectColumn<TData extends RowData>(): DataTableColumnDef<TData> {
   return {
     id: SELECT_COLUMN_ID,
     enableSorting: false,
@@ -206,8 +219,8 @@ function selectColumn<TData>(): DataTableColumnDef<TData> {
   };
 }
 
-function ariaSort<TData>(
-  header: Header<TData, unknown>,
+function ariaSort<TData extends RowData>(
+  header: Header<DataTableFeatures, TData, unknown>,
 ): 'ascending' | 'descending' | 'none' | undefined {
   if (header.isPlaceholder || !header.column.getCanSort()) return undefined;
   const sorted = header.column.getIsSorted();
@@ -227,7 +240,7 @@ const headClass =
 const cellClass = 'p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0';
 
 /**
- * A data table on TanStack Table: sorting, search and column filters, pagination, column
+ * A data table on TanStack Table v9: sorting, search and column filters, pagination, column
  * visibility and row selection, with a hook-in for row virtualization. Works with client-side
  * data out of the box; set the `manual*` props to sort, filter or page on the server. Each
  * piece of state can be left to the table or controlled with its prop and `on*Change`.
@@ -243,7 +256,7 @@ const cellClass = 'p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:p
  * <DataTable columns={columns} data={tasks} getRowId={(task) => task.id} enableRowSelection />
  * ```
  */
-export function DataTable<TData, TValue = unknown>({
+export function DataTable<TData extends RowData, TValue = unknown>({
   columns,
   data,
   getRowId,
@@ -293,7 +306,7 @@ export function DataTable<TData, TValue = unknown>({
   );
 
   // Only pass the pieces of state the caller controls; the table keeps the rest itself.
-  const state: Partial<TableState> = {};
+  const state: Partial<DataTableState> = {};
   if (sorting !== undefined) state.sorting = sorting;
   if (columnFilters !== undefined) state.columnFilters = columnFilters;
   if (globalFilter !== undefined) state.globalFilter = globalFilter;
@@ -301,12 +314,19 @@ export function DataTable<TData, TValue = unknown>({
   if (columnVisibility !== undefined) state.columnVisibility = columnVisibility;
   if (rowSelection !== undefined) state.rowSelection = rowSelection;
 
-  const table = useReactTable<TData>({
+  // The default selector subscribes to the whole state, so the toolbar and pagination
+  // (which read `table.state`) re-render with every change.
+  const table = useTable<DataTableFeatures, TData, DataTableState>({
+    features: dataTableFeatures,
     data,
-    columns: allColumns,
+    // v9 types the column list with `unknown` cell values; a column typed with a narrower
+    // TValue is the same object at runtime, so widen the list once here.
+    columns: allColumns as unknown as DataTableColumnDef<TData>[],
     state,
     initialState: { pagination: { pageIndex: 0, pageSize }, ...initialState },
     enableRowSelection,
+    // v9 selects a range on Shift+click by default; checkboxes here toggle one row at a time.
+    enableRowRangeSelection: false,
     enableSorting,
     enableMultiSort,
     manualSorting,
@@ -314,10 +334,6 @@ export function DataTable<TData, TValue = unknown>({
     // Without pagination every row is shown: skip the pagination row model.
     manualPagination: manualPagination || !paginate,
     globalFilterFn: 'includesString',
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     ...(getRowId ? { getRowId } : {}),
     ...(rowCount !== undefined ? { rowCount } : {}),
     ...(onSortingChange ? { onSortingChange } : {}),
@@ -335,7 +351,7 @@ export function DataTable<TData, TValue = unknown>({
   const virtual = useRows(rows, getScrollElement);
   const columnCount = table.getVisibleLeafColumns().length;
 
-  const renderRow = (row: Row<TData>, key: Key): JSX.Element => (
+  const renderRow = (row: DataTableRow<TData>, key: Key): JSX.Element => (
     <tr
       key={key}
       data-slot="data-table-row"

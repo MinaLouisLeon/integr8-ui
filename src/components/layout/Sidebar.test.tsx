@@ -8,14 +8,20 @@ import {
   SidebarError,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarInput,
   SidebarInset,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   type SidebarProps,
   SidebarProvider,
   type SidebarProviderProps,
+  SidebarRail,
   SidebarTrigger,
   useSidebar,
 } from './Sidebar';
@@ -245,5 +251,223 @@ describe('useSidebar', () => {
     expect(result.current.state).toBe('collapsed');
     expect(result.current.open).toBe(false);
     expect(result.current.isMobile).toBe(false);
+  });
+});
+
+describe('Sidebar variants', () => {
+  it('defaults to the sidebar variant with a bordered card column', () => {
+    const { container } = render(<Shell />);
+    const inner = container.querySelector('[data-slot="sidebar-inner"]') as HTMLElement;
+
+    expect(sidebar(container).dataset.variant).toBe('sidebar');
+    expect(inner.className).toContain('bg-card');
+    expect(inner.className).toContain('border-r');
+    expect(container.querySelector('[data-slot="sidebar-panel"]')).toBeNull();
+  });
+
+  it('wraps the content in a rounded panel with variant="floating"', () => {
+    const { container } = render(<Shell sidebarProps={{ variant: 'floating' }} />);
+    const panel = container.querySelector('[data-slot="sidebar-panel"]') as HTMLElement;
+
+    expect(sidebar(container).dataset.variant).toBe('floating');
+    expect(panel.className).toContain('rounded-lg');
+    expect(panel.className).toContain('bg-card');
+    expect(panel.textContent).toContain('Files');
+    expect(sidebar(container).className).toContain(
+      'data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem)]',
+    );
+  });
+
+  it('turns the inset into a card with variant="inset"', () => {
+    const { container } = render(<Shell sidebarProps={{ variant: 'inset' }} />);
+    const inset = container.querySelector('[data-slot="sidebar-inset"]') as HTMLElement;
+    const wrapper = container.querySelector('[data-slot="sidebar-wrapper"]') as HTMLElement;
+
+    expect(sidebar(container).dataset.variant).toBe('inset');
+    expect(inset.className).toContain('md:peer-data-[variant=inset]:rounded-xl');
+    expect(wrapper.className).toContain('has-data-[variant=inset]:bg-card');
+  });
+});
+
+describe('SidebarRail', () => {
+  it('toggles the sidebar on click and stays out of the Tab order', async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarRail />
+        </Sidebar>
+      </SidebarProvider>,
+    );
+    const rail = screen.getByRole('button', { name: 'Toggle sidebar' });
+
+    expect(rail.tabIndex).toBe(-1);
+    expect(rail.dataset.slot).toBe('sidebar-rail');
+    await user.click(rail);
+    expect(sidebar(container).dataset.state).toBe('collapsed');
+    await user.click(rail);
+    expect(sidebar(container).dataset.state).toBe('expanded');
+  });
+
+  it('uses a custom label and skips the toggle when onClick prevents default', async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <SidebarProvider>
+        <Sidebar side="right">
+          <SidebarRail label="Resize" onClick={(event) => event.preventDefault()} />
+        </Sidebar>
+      </SidebarProvider>,
+    );
+    const rail = screen.getByRole('button', { name: 'Resize' });
+
+    expect(rail.className).toContain('left-0');
+    await user.click(rail);
+    expect(sidebar(container).dataset.state).toBe('expanded');
+  });
+});
+
+describe('SidebarInput', () => {
+  it('renders a compact input that hides in icon mode', () => {
+    render(
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarInput aria-label="Search files" className="extra" />
+        </Sidebar>
+      </SidebarProvider>,
+    );
+    const input = screen.getByRole('textbox', { name: 'Search files' });
+
+    expect(input.dataset.slot).toBe('sidebar-input');
+    expect(input.className).toContain('group-data-[collapsible=icon]:hidden');
+    expect(input.className).toContain('extra');
+  });
+});
+
+describe('SidebarMenuAction', () => {
+  it('renders a button next to the menu button and can show only on hover', async () => {
+    const onClick = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <span>Projects</span>
+              </SidebarMenuButton>
+              <SidebarMenuAction aria-label="Add project" onClick={onClick} showOnHover>
+                <svg />
+              </SidebarMenuAction>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </Sidebar>
+      </SidebarProvider>,
+    );
+    const action = screen.getByRole('button', { name: 'Add project' });
+
+    expect(action.getAttribute('type')).toBe('button');
+    expect(action.className).toContain('md:opacity-0');
+    expect(screen.getByRole('button', { name: 'Projects' }).className).toContain(
+      'group-has-data-[slot=sidebar-menu-action]/menu-item:pr-8',
+    );
+    await user.click(action);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('is always visible by default and supports asChild', () => {
+    render(
+      <SidebarProvider>
+        <SidebarMenuAction asChild>
+          <a href="#new">New</a>
+        </SidebarMenuAction>
+      </SidebarProvider>,
+    );
+    const link = screen.getByRole('link', { name: 'New' });
+
+    expect(link.dataset.slot).toBe('sidebar-menu-action');
+    expect(link.className).not.toContain('md:opacity-0');
+    expect(link.hasAttribute('type')).toBe(false);
+  });
+});
+
+describe('SidebarMenuSub', () => {
+  it('renders a nested list with active and sized sub buttons', () => {
+    render(
+      <SidebarMenuSub className="extra">
+        <SidebarMenuSubItem>
+          <SidebarMenuSubButton isActive>Intro</SidebarMenuSubButton>
+        </SidebarMenuSubItem>
+        <SidebarMenuSubItem>
+          <SidebarMenuSubButton asChild size="sm">
+            <a href="#api">API</a>
+          </SidebarMenuSubButton>
+        </SidebarMenuSubItem>
+      </SidebarMenuSub>,
+    );
+    const list = screen.getByRole('list');
+    const intro = screen.getByRole('button', { name: 'Intro' });
+    const api = screen.getByRole('link', { name: 'API' });
+
+    expect(list.dataset.slot).toBe('sidebar-menu-sub');
+    expect(list.className).toContain('extra');
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+    expect(intro.getAttribute('aria-current')).toBe('page');
+    expect(intro.dataset.active).toBe('true');
+    expect(intro.className).toContain('text-sm');
+    expect(api.dataset.size).toBe('sm');
+    expect(api.className).toContain('text-xs');
+    expect(api.getAttribute('aria-current')).toBeNull();
+  });
+});
+
+/** Removes a cookie set by a test. */
+function clearCookie(name: string): void {
+  // biome-ignore lint/suspicious/noDocumentCookie: tests read and clear real cookies.
+  document.cookie = `${name}=; path=/; max-age=0`;
+}
+
+/** Saves a cookie, as a previous visit would have. */
+function setCookie(name: string, value: string): void {
+  // biome-ignore lint/suspicious/noDocumentCookie: tests read and clear real cookies.
+  document.cookie = `${name}=${value}; path=/`;
+}
+
+describe('SidebarProvider persist="cookie"', () => {
+  afterEach(() => {
+    clearCookie('sidebar_state');
+    clearCookie('ide_sidebar');
+  });
+
+  it('writes the state to the sidebar_state cookie on every change', async () => {
+    const user = userEvent.setup();
+    render(<Shell providerProps={{ persist: 'cookie' }} />);
+
+    await user.click(screen.getByRole('button', { name: 'Toggle sidebar' }));
+    expect(document.cookie).toContain('sidebar_state=false');
+
+    await user.click(screen.getByRole('button', { name: 'Toggle sidebar' }));
+    expect(document.cookie).toContain('sidebar_state=true');
+  });
+
+  it('starts from the saved cookie, under a custom name', () => {
+    setCookie('ide_sidebar', 'false');
+    const { container } = render(
+      <Shell providerProps={{ persist: 'cookie', cookieName: 'ide_sidebar' }} />,
+    );
+
+    expect(sidebar(container).dataset.state).toBe('collapsed');
+  });
+
+  it('ignores a saved cookie when persist is off', () => {
+    setCookie('sidebar_state', 'false');
+    const { container } = render(<Shell />);
+    expect(sidebar(container).dataset.state).toBe('expanded');
+  });
+
+  it('does not write a cookie when persist is off', async () => {
+    const user = userEvent.setup();
+    render(<Shell />);
+    await user.click(screen.getByRole('button', { name: 'Toggle sidebar' }));
+    expect(document.cookie).not.toContain('sidebar_state');
   });
 });

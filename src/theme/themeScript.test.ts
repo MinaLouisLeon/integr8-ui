@@ -30,6 +30,15 @@ describe('getThemeScript', () => {
     expect(root.classList.contains('dark')).toBe(true);
   });
 
+  it('knows integr8-light as a light-based built-in theme', () => {
+    root.classList.add('dark');
+    window.localStorage.setItem('integr8-theme', 'integr8-light');
+    run(getThemeScript());
+
+    expect(root.getAttribute('data-theme')).toBe('integr8-light');
+    expect(root.classList.contains('dark')).toBe(false);
+  });
+
   it('removes the dark class for a light theme', () => {
     root.classList.add('dark');
     window.localStorage.setItem('integr8-theme', 'light');

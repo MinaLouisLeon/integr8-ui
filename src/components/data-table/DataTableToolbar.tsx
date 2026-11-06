@@ -1,18 +1,19 @@
 'use client';
 
-import type { Table } from '@tanstack/react-table';
+import type { RowData } from '@tanstack/react-table';
 import { XIcon } from 'lucide-react';
 import type { ComponentProps, JSX, ReactNode } from 'react';
 import { cn } from '../../lib/cn';
 import { Button } from '../basics/Button';
 import { Input } from '../basics/Input';
 import { DataTableViewOptions } from './DataTableViewOptions';
+import type { DataTableInstance } from './dataTableFeatures';
 import { useDataTableLabels } from './dataTableLabels';
 
 /** Props for {@link DataTableToolbar}. */
-export type DataTableToolbarProps<TData> = ComponentProps<'div'> & {
+export type DataTableToolbarProps<TData extends RowData> = ComponentProps<'div'> & {
   /** The table instance. */
-  table: Table<TData>;
+  table: DataTableInstance<TData>;
   /** Show the search input that sets the table's global filter. Default `true`. */
   showSearch?: boolean | undefined;
   /** Show the {@link DataTableViewOptions} button on the right. Default `true`. */
@@ -40,7 +41,7 @@ export type DataTableToolbarProps<TData> = ComponentProps<'div'> & {
  * />
  * ```
  */
-export function DataTableToolbar<TData>({
+export function DataTableToolbar<TData extends RowData>({
   table,
   showSearch = true,
   showViewOptions = true,
@@ -49,7 +50,7 @@ export function DataTableToolbar<TData>({
   ...props
 }: DataTableToolbarProps<TData>): JSX.Element {
   const labels = useDataTableLabels();
-  const { globalFilter, columnFilters } = table.getState();
+  const { globalFilter, columnFilters } = table.state;
   const search = typeof globalFilter === 'string' ? globalFilter : '';
   const filtered = search !== '' || columnFilters.length > 0;
 

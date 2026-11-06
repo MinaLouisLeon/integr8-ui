@@ -17,7 +17,7 @@ const buttonVariants = cva(
     'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
     "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     // Integr8 theme: pill buttons, like integr8-media.com.
-    'in-data-[theme=integr8]:rounded-full',
+    'integr8:rounded-full',
   ],
   {
     variants: {
